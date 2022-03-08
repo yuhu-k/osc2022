@@ -5,10 +5,8 @@
 #define uint32 unsigned int
 #define block_size 128
 
-extern byte  __load_kernel_location;
-
 void loadimg(){
-    uint32 addr=&__load_kernel_location;
+    uint32 addr=0x80000;
     uart_printf("Start receiving.\n");
     byte SIZE[5];
     byte par=0;

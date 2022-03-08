@@ -1,8 +1,8 @@
-.section ".text.relocate"
+.section ".text.boot"
 
-.global _relocate
+.global _start
 
-_relocate:
+_start:
     // get cpu id
     mrs     x1, MPIDR_EL1
     and     x1, x1, #3
@@ -14,7 +14,7 @@ _relocate:
     // if cpu_id == 0
 2:
     // set stack pointer
-    ldr     x1, =_relocate
+    ldr     x1, =_start
     mov     sp, x1
 
     // clear bss
@@ -25,20 +25,7 @@ _relocate:
     sub     x2, x2, #1
     cbnz    x2, 3b
 
-    // jump to relocator function in C
-4:  bl      relocator
-
-
-.section ".text.boot"
-
-.global _start
-
-_start:
-    // set stack pointer
-    ldr     x1, =_start
-    mov     sp, x1
     // jump to main function in C
-1:  bl      main
+4:  bl      main
     // halt this core if return
-    wfe
     b       1b

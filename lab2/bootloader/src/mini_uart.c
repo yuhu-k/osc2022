@@ -72,7 +72,6 @@ void uart_printf(char* fmt, ...) {
     __builtin_va_list args;
     __builtin_va_start(args, fmt);
 
-    int i=0;
     while (*fmt) {
         if (*fmt == '\n') uart_write('\r');
         else if(*fmt == '%'){
@@ -90,6 +89,9 @@ void uart_printf(char* fmt, ...) {
                 char temp[10];
                 i16toa(arg,temp,8);
                 uart_printf(temp);
+            }else if(*fmt == 'c'){
+                char arg = __builtin_va_arg(args, char);
+                uart_write(arg);
             }
             fmt++;
             continue;

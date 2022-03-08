@@ -5,11 +5,6 @@ __stack_size = 0x800;;
 SECTIONS
 {
   . = 0x80000;
-  .relocate :{
-    KEEP(*(.text.allocate))
-    *(.allocator)
-  }
-  _begin = .;
   .text :
   {
     KEEP(*(.text.boot))
@@ -39,5 +34,5 @@ SECTIONS
 }
 
 __bss_size = (__bss_end - __bss_start) >> 3;
-__load_kernel_location = 0x01000000;
+__load_kernel_location = 0x00100000;
 __heap_start = end - 8;

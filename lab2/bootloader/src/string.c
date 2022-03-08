@@ -60,3 +60,14 @@ int strcmp(char *string1, char *string2){
     }
     return 1;
 }
+
+int strncmp(char *string1, char *string2, int length){
+    char temp1[128],temp2[128];
+    for(int i=0;i<length;i++){
+        temp1[i]=string1[i];
+        temp2[i]=string2[i];
+    }
+    temp1[length]='\0';
+    temp2[length]='\0';
+    return strcmp(temp1,temp2);
+}

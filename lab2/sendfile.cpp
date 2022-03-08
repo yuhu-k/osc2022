@@ -63,6 +63,7 @@ int main(int argc, char* argv[]){
     }
     port_setting(serial_port,tty);
 
+
     fstream  file; 
     file.open(argv[2],ios::in | ios::binary);
     if(!file){
@@ -100,28 +101,6 @@ int main(int argc, char* argv[]){
         }
     }
 
-    /*
-    while(now<size){
-        int input_size;
-        if(size-now<block_size) input_size=size-now;
-        else input_size=block_size;
-        par_bit=0;
-        unsigned char *buf;
-        buf=new unsigned char[block_size];
-        for(int i=0;i<input_size;i++){
-            buf[i]=buffer[now++];
-        }
-        write(serial_port, buf, input_size+1);
-        char b;
-        /*int i=0;
-        do{
-            write(serial_port, buf, input_size+1);
-            read(serial_port, &b, 1);
-            i++;
-        }while(b==0 && i<10);
-        write(serial_port, buf, input_size+1);
-        free(buf);
-    }*/
     file.close();
     close(serial_port);
     return 0; // success

@@ -5,22 +5,20 @@ SRC_DIR = src
 DUM_DIR = out
 
 SRCS = $(wildcard $(SRC_DIR)/*.c)
+SRCSS = $(wildcard $(SRC_DIR)/*.S)
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(DUM_DIR)/%.o)
-FILESENDER = sendfile
+OBJSS = $(SRCSS:$(SRC_DIR)/%.S=$(DUM_DIR)/%.o)
 
-.PHONY: all clean run debug
+.PHONY: all clean run debug tty
 
-all: kernel8.img $(FILESENDER)
+all: kernel8.img 
 
-$(FILESENDER): $(FILESENDER).cpp
-	g++ $@.cpp -o $@
-
-kernel8.img: $(DUM_DIR) $(OBJS) $(DUM_DIR)/start.o $(SRC_DIR)/linker.ld
+kernel8.img: $(DUM_DIR) $(OBJS) $(OBJSS) $(SRC_DIR)/linker.ld
 	$(tool_chain)ld -T $(SRC_DIR)/linker.ld -o kernel8.elf $(OBJS) $(DUM_DIR)/start.o
 	$(tool_chain)objcopy -O binary kernel8.elf kernel8.img
 
-$(DUM_DIR)/start.o: $(SRC_DIR)/start.S
-	$(tool_chain)gcc -c $(SRC_DIR)/start.S -o $(DUM_DIR)/start.o 
+$(DUM_DIR)/%.o: $(SRC_DIR)/%.S
+	$(tool_chain)gcc -c $< -o $@
 
 $(DUM_DIR)/%.o: $(SRC_DIR)/%.c
 	$(tool_chain)gcc -Wall -I include -c $< -o $@ -fno-stack-protector
@@ -31,14 +29,12 @@ $(DUM_DIR):
 clean:
 	rm -rf kernel8.*
 	rm -rf out
-	rm -rf $(FILESENDER)
 
 run: all
 	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial stdio
-
-debug: 
+tty:
 	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial pty
+debug: 
+	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial stdio -initrd initramfs.cpio
 
-send: $(FILESENDER)
-	./$< $(args)
 

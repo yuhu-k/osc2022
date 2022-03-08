@@ -1,19 +1,28 @@
-__heap_size = 0x200;;
-__stack_size = 0x800;;
-
 SECTIONS
 {
   . = 0x80000;
+  .relocate :
+  {
+    KEEP(*(.text.relocate))
+    *(.relocator)
+  }
+  . = ALIGN(4096);
+
+  _begin = .;
   .text :
   {
     KEEP(*(.text.boot))
     *(.text)
   }
+  . = ALIGN(4096);
+
   .data :
   {
     *(.data)
   }
-  .bss ALIGN(16) (NOLOAD) :
+  . = ALIGN(4096);
+
+  .bss (NOLOAD) :
   {
     __bss_start = .;
 
@@ -21,8 +30,10 @@ SECTIONS
 
     __bss_end = .;
   }
+  . = ALIGN(4096);
   _end = .;
 }
 
 __bss_size = (__bss_end - __bss_start) >> 3;
-__load_kernel_location = 0x00100000;
+__relocation = 0x01080000;
+
