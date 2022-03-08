@@ -17,7 +17,7 @@ void uart_read_line(char *fmt){
     while(1){
         in=uart_read();
         if(in=='\n'){
-            fmt[i++]=in;
+            fmt[i++]='\0';
             uart_printf("\n");
             break;
         }else if((in==8 || in==127)){
@@ -33,34 +33,45 @@ void uart_read_line(char *fmt){
             uart_printf("^C\n# ");
             i=0;
             continue;
+        }else if( in>=32 && in<=126 ){
+            fmt[i++]=in;
+            uart_write(in);
         }
-        fmt[i++]=in;
-        uart_write(in);
     }
     fmt[i]='\0';
 }
 
 void check(char *input){
+    if(input[0] == '\0' || input[0] == '\n') return;
     if(strcmp(input,"help")==1){
-        uart_printf("help     : print the help menu\n");
-        uart_printf("hello    : print Hello World!\n");
-        uart_printf("reboot   : reboot the device\n");
-        uart_printf("loadimg  : load image from user\n");
+        uart_printf("help    : print the help menu\n");
+        uart_printf("hello   : print Hello World!\n");
+        uart_printf("reboot  : reboot the device\n");
     }else if(strcmp(input,"hello")==1){
         uart_printf("Hello World!\n");
     }else if(strncmp(input,"reboot ",7)==1){
         uart_printf("Rebooting...\n");
         int a=0;
-        for(int i=7;input[i]<'9' && input[i]>'0';i++){
+        for(int i=7;input[i]<='9' && input[i]>='0';i++){
             a *= 10;
             a += (input[i]-'0');
         }
-        reset(0);
+        reset(a<50? 50:a);
         while(1);
     }else if(strcmp(input,"loadimg")){
-        uart_printf("Loading...\n");
+        uart_printf("loading...\n");
         loadimg();
+    }else if(strcmp(input,"ls")){
+        list(0x20000000);
+    }else if(strncmp(input,"cat ", 4)){
+        char name[128];
+        int i=4;
+        for(i=4;input[i]>=46 && input[i]<=122  && i<128 && input[i]!='\0'; i++){
+            name[i-4]=input[i];
+        }
+        name[i]='\0';
+        print_content(name, 0x20000000);
     }else{
-        uart_printf("command not found: %s", input);
+        uart_printf("command not found: %s\n",input);
     }
 }

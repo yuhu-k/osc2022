@@ -5,6 +5,7 @@
 #define uint32 unsigned int
 #define block_size 128
 
+
 void loadimg(){
     uint32 addr=0x80000;
     uart_printf("Start receiving.\n");

@@ -1,8 +1,7 @@
 #include "mini_uart.h"
 #include "string.h"
-//#include "reboot.h"
+#include "reboot.h"
 #include "cpio.h"
-#include "loadimg.h"
 #include "allocator.h"
 #include "uint.h"
 extern byte __heap_start;
@@ -64,9 +63,6 @@ void check(char *input){
         }
         reset(a<50? 50:a);
         while(1);
-    }else if(strcmp(input,"loadimg")){
-        uart_printf("loading...\n");
-        loadimg();
     }else if(strcmp(input,"ls")){
         list(0x20000000);
     }else if(strncmp(input,"cat ", 4)){
@@ -78,7 +74,6 @@ void check(char *input){
         name[i]='\0';
         print_content(name, 0x20000000);
     }else{
-        uart_printf("command not found: ");
-        uart_printf(input);
+        uart_printf("command not found: %s\n",input);
     }
 }

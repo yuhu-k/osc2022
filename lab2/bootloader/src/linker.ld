@@ -4,11 +4,11 @@ SECTIONS
   .relocate :
   {
     KEEP(*(.text.relocate))
-    *(.relocator)
+    *(.text.relocator)
   }
   . = ALIGN(4096);
 
-  _begin = .;
+  _begin_ = .;
   .text :
   {
     KEEP(*(.text.boot))
@@ -31,7 +31,9 @@ SECTIONS
     __bss_end = .;
   }
   . = ALIGN(4096);
-  _end = .;
+  _end_ = .;
+
+
 }
 
 __bss_size = (__bss_end - __bss_start) >> 3;
