@@ -90,8 +90,25 @@ void uart_printf(char* fmt, ...) {
                 i16toa(arg,temp,8);
                 uart_printf(temp);
             }else if(*fmt == 'c'){
-                char arg = __builtin_va_arg(args, char);
-                uart_write(arg);
+                char *arg = __builtin_va_arg(args, char*);
+                uart_write(*arg);
+            }
+            else if(*fmt++ == 'l'){
+                if(*fmt == 'e'){
+                    unsigned int arg = __builtin_va_arg(args, unsigned int);
+                    unsigned char *t = (unsigned char *) &arg;
+                    for(int i=0;i<4;i++){
+                        unsigned char temp[3];
+                        temp[2]='\0';
+                        i16toa(t[i],temp,2);
+                        uart_printf(temp);
+                    }
+                }else if(*fmt == 'l'){
+                    unsigned long long arg = __builtin_va_arg(args, unsigned long long);
+                    unsigned char temp[24];
+                    itoa(arg, temp);
+                    uart_printf("%s",temp);
+                }
             }
             fmt++;
             continue;

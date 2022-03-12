@@ -7,11 +7,11 @@
 
 
 void loadimg(){
-    uint32 addr=0x80000;
+    uint32 addr=0x80000; // load to 0x80000
     uart_printf("Start receiving.\n");
     byte SIZE[5];
     byte par=0;
-    for(int i=0;i<5;i++){
+    for(int i=0;i<5;i++){  //receive file size
         byte temp=uart_read_raw();
         SIZE[i]=temp;
         if(i!=4) par ^= temp;
@@ -21,20 +21,19 @@ void loadimg(){
         return;
     }
     uint32 size=0;
-    for(int i=0;i<4;i++){
+    for(int i=0;i<4;i++){ 
         size <<= 8;
         size += SIZE[i];
     }
     byte *kernel = (byte*) addr;
     byte check_byte=0;
     int j=0;
-    for(int i=0;i<size;i++){
+    for(int i=0;i<size;i++){ //receive file
         byte c=uart_read_raw();
         *(kernel+i)=c;
         check_byte ^= c;
-        if(i%8 == 7){
+        if(i%8 == 7){ //check whether there is any error
             byte temp=uart_read_raw();
-            //uart_printf("%d\n",(uint32)temp);
             if(check_byte != temp){
                 if(j++>=5){
                     uart_printf("Error! Please try again later.\n");
@@ -54,7 +53,7 @@ void loadimg(){
             }
         }
     }
-    void (*start_os)(void) = (void *)kernel;
+    void (*start_os)(void) = (void *)kernel; //set start_os's addr to the loaded image's addr
     uart_printf("Loading Complete.\n");
     uart_printf("Redirecting to 0x%x\n",addr);
     start_os();

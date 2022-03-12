@@ -3,11 +3,28 @@
 #include "reboot.h"
 #include "loadimg.h"
 #include "uint.h"
+#include "dtb.h"
+
+extern unsigned char __heap_start;
+uint32 cpio_start,cpio_end;
 
 void shell_init(){
     uart_init();
     uart_flush();
     uart_printf("\n\nHello From RPI3\n");
+    uint32 *heap = (uint32*)(&__heap_start-8);
+    *heap &= 0x00000000;
+    traverse_tree("/\0",0);    //traverse device tree
+    uint32 *ramf_start,*ramf_end;
+    ramf_start=find_property_value("/chosen\0","linux,initrd-start\0");  //get ramf start addr from dtb
+    ramf_end=find_property_value("/chosen\0","linux,initrd-end\0"); //get ramf end addr from dtb
+    if(ramf_start != 0){
+        uart_printf("Ramf start: 0x%x\n",letobe(*ramf_start));
+        cpio_start=letobe(*ramf_start);
+    }if(ramf_end != 0){
+        uart_printf("Ramf end: 0x%x\n",letobe(*ramf_end));
+        cpio_end=letobe(*ramf_end);
+    }
 }
 
 void uart_read_line(char *fmt){
@@ -62,7 +79,7 @@ void check(char *input){
         uart_printf("loading...\n");
         loadimg();
     }else if(strcmp(input,"ls")){
-        list(0x20000000);
+        list(cpio_start);
     }else if(strncmp(input,"cat ", 4)){
         char name[128];
         int i=4;
@@ -70,7 +87,7 @@ void check(char *input){
             name[i-4]=input[i];
         }
         name[i]='\0';
-        print_content(name, 0x20000000);
+        print_content(name, cpio_start);
     }else{
         uart_printf("command not found: %s\n",input);
     }

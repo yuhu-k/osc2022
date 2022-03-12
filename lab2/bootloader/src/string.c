@@ -1,10 +1,7 @@
-void itoa(int value,char *s) {
+#include "uint.h"
+void itoa(unsigned long long value,char *s) {
     int idx = 0;
-    if (value < 0) {
-        value *= -1;
-        s[idx++] = '-';
-    }
-    char tmp[10];
+    char tmp[24];
     int tidx = 0;
     do {
         tmp[tidx++] = '0' + value % 10;
@@ -18,12 +15,12 @@ void itoa(int value,char *s) {
     s[idx] = '\0';
 }
 
-void i16toa(int value, char *s, int digits) {
+void i16toa(unsigned int value, char *s, int digits) {
     int idx = 0;
     char tmp[11];
     int tidx = 0;
     do {
-        if(value % 16<10)
+        if((value % 16) < 10)
           tmp[tidx++] = '0' + value % 16;
         else
           tmp[tidx++] = 'A' + value % 16 - 10;
@@ -70,4 +67,19 @@ int strncmp(char *string1, char *string2, int length){
     temp1[length]='\0';
     temp2[length]='\0';
     return strcmp(temp1,temp2);
+}
+
+void strcpy(char *string1, char* string2, int length){
+    for(int i=0;i<length;i++) string2[i]=string1[i];
+    string2[length]='\0';
+}
+
+uint32 letobe(uint32 o){
+    byte *temp = (byte*) &o;
+    uint32 result=0;
+    for(int i=0;i<4;i++){
+        result *= 256;
+        result += temp[i];
+    }
+    return result;
 }

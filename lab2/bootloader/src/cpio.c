@@ -2,7 +2,7 @@
 #include "mini_uart.h"
 #include "string.h"
 
-typedef struct cpio_newc_header {
+typedef struct cpio_newc_header {  //cpio new ascii struct
 		   char	   c_magic[6];
 		   char	   c_ino[8];
 		   char	   c_mode[8];
@@ -19,7 +19,7 @@ typedef struct cpio_newc_header {
 		   char	   c_check[8];
 }CPIO_H ;
 
-int a16toi(char *num, int length){
+int a16toi(char *num, int length){  // transform hex string to int
     int namesize=0;
     for(int i=0;i<length;i++){
         namesize <<= 4;
@@ -32,11 +32,9 @@ int a16toi(char *num, int length){
     return namesize;
 }
 
-void list(uint32 addr){
+void list(uint32 addr){ // proceed ls
     CPIO_H *cpio=(CPIO_H*) addr;
-    char par_bit=0;
-    for(int i=0;i<8;i++) par_bit ^= cpio->c_check[i]; 
-    while(par_bit==0){
+    while(strncmp(cpio->c_magic,"070701\0",6)==1){ //c_magic is always "070701"
         int namesize=a16toi(cpio->c_namesize, 8);
 
         char *name=(char*)(cpio+1);
@@ -48,19 +46,14 @@ void list(uint32 addr){
         int filesize=a16toi(cpio->c_filesize, 8);
         uart_printf("%s\n",temp);
 
-        addr+=(110+namesize+filesize);
+        addr+=(110+namesize+filesize);  // padding is included in namesize and filesize
         cpio=(CPIO_H*) addr;
-        for(int i=0;i<8;i++) par_bit ^= cpio->c_check[i]; 
     }
 }
 
 void print_content(char *file, uint32 addr){
     CPIO_H *cpio=(CPIO_H*) addr;
-    char par_bit=0;
-    for(int i=0;i<8;i++){
-        par_bit ^= cpio->c_check[i]; 
-    }
-    while(par_bit==0){
+    while(strncmp(cpio->c_magic,"070701\0",6)==1){
         int namesize=a16toi(cpio->c_namesize, 8);
         char *name=(char*)(cpio+1);
         char temp[128];
@@ -81,7 +74,6 @@ void print_content(char *file, uint32 addr){
         }
         addr+=(110+namesize+filesize);
         cpio=(CPIO_H*) addr;
-        for(int i=0;i<8;i++) par_bit ^= cpio->c_check[i]; 
     }
     uart_printf("Not found file \"%s\"\n",file);
 }

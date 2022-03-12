@@ -13,9 +13,14 @@ _relocate:
     b       1b
     // if cpu_id == 0
 2:
+    // save dtb location
+    ldr     x1, =__dtb_addr
+    str     x0, [x1]
+    
     // set stack pointer
     ldr     x1, =__relocation
     mov     sp, x1
+
 
     // clear bss
     ldr     x1, =__bss_start
