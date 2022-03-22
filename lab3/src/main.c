@@ -3,6 +3,7 @@
 #include "mailbox.h"
 #define max_length 128
 
+//extern struct commands COM;
 
 int main() {
     shell_init();

@@ -18,10 +18,10 @@ kernel8.img: $(DUM_DIR) $(OBJS) $(OBJSS) $(SRC_DIR)/linker.ld
 	$(tool_chain)objcopy -O binary kernel8.elf kernel8.img
 
 $(DUM_DIR)/%.o: $(SRC_DIR)/%.S
-	$(tool_chain)gcc -c $< -o $@
+	$(tool_chain)gcc -g -Wall -I include -c $< -o $@
 
 $(DUM_DIR)/%.o: $(SRC_DIR)/%.c
-	$(tool_chain)gcc -Wall -I include -c $< -o $@ -fno-stack-protector
+	$(tool_chain)gcc -g -Wall -I include -c $< -o $@ -fno-stack-protector
 
 $(DUM_DIR): 
 	mkdir -p $(DUM_DIR)
@@ -34,11 +34,11 @@ clean:
 	rm -rf out
 
 run: all
-	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial stdio
+	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial stdio -initrd initramfs.cpio
 tty:
 	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial pty
 debug: 
-	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial stdio -initrd initramfs.cpio
+	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -S -s -initrd initramfs.cpio
 dev:
 	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial stdio -initrd initramfs.cpio -dtb bcm2710-rpi-3-b-plus.dtb 
 
