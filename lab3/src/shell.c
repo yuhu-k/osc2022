@@ -133,6 +133,11 @@ void check(char *input){
         }
         name[i]='\0';
         print_content(name, cpio_start);
+    }else if(strcmp(input,"echo")){
+        __asm__ volatile("bl      from_el1_to_el0\n"
+                         "ldr     x1, =0x40000\n"
+                         "mov     sp, x1\n");
+        uart_printf("goto el0 successfully\n");
     }else{
         uart_printf("command not found: %s\n",input);
     }

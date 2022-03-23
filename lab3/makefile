@@ -34,7 +34,7 @@ clean:
 	rm -rf out
 
 run: all
-	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial stdio -initrd initramfs.cpio
+	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial stdio -initrd initramfs.cpio -d int
 tty:
 	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial pty
 debug: 
