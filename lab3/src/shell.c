@@ -5,7 +5,6 @@
 #include "dtb.h"
 #include "allocator.h"
 
-#define NULL (void*)0
 
 extern unsigned char __heap_start;
 uint32 cpio_start,cpio_end;
@@ -41,6 +40,7 @@ void shell_init(){
         uart_printf("Ramf end: 0x%x\n",letobe(*ramf_end));
         cpio_end=letobe(*ramf_end);
     }*/
+    cpio_start = 0x8000000 ;
     //COM=init_commands();
 }
 
@@ -127,6 +127,7 @@ void check(char *input){
         list(cpio_start);
     }else if(strncmp(input,"cat ", 4)){
         char name[128];
+        for(int i=0;i<128;i++) name[i] &= 0;
         int i=4;
         for(i=4;input[i]>=46 && input[i]<=122  && i<128 && input[i]!='\0'; i++){
             name[i-4]=input[i];
@@ -134,10 +135,20 @@ void check(char *input){
         name[i]='\0';
         print_content(name, cpio_start);
     }else if(strcmp(input,"echo")){
-        __asm__ volatile("bl      from_el1_to_el0\n"
-                         "ldr     x1, =0x40000\n"
-                         "mov     sp, x1\n");
-        uart_printf("goto el0 successfully\n");
+        char* save_lr=simple_malloc(8);
+        char* save_sp=simple_malloc(8);
+        asm volatile("add     x1, sp, #0\n"
+                     "str     x1, [%[input0]]\n"
+                     "str     lr, [%[input1]]\n"
+                     "bl      from_el1_to_el0\n"
+                     "ldr     x1, =0x40000\n"
+                     "mov     sp, x1\n"
+                     "ldr     lr, [%[input1]]\n"
+                     "ldr     x1, [%[input0]]\n"
+                     "add     sp, x1, #0\n"
+                     :: [input0] "r" (save_sp), [input1] "r" (save_lr)
+                     );
+        execute("kernel8.img\0",cpio_start);
     }else{
         uart_printf("command not found: %s\n",input);
     }

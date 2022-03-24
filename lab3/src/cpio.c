@@ -36,22 +36,29 @@ void list(uint32 addr){ // proceed ls
     CPIO_H *cpio=(CPIO_H*) addr;
     while(strncmp(cpio->c_magic,"070701\0",6)==1){ //c_magic is always "070701"
         int namesize=a16toi(cpio->c_namesize, 8);
-
         char *name=(char*)(cpio+1);
         char temp[128];
         for(int i=0;i<namesize;i++){
             temp[i]=name[i];
         }
         temp[namesize]='\0';
+        if(strncmp(temp, "TRAILER!!!", 10)) return;
         int filesize=a16toi(cpio->c_filesize, 8);
         uart_printf("%s\n",temp);
 
-        addr+=(110+namesize+filesize);  // padding is included in namesize and filesize
+        int sum=110+namesize+filesize;
+        if(sum%4 != 0){
+            sum/=4;
+            sum*=4;
+            sum+=4;
+        }
+        addr+=sum;  // padding is included in namesize and filesize
+
         cpio=(CPIO_H*) addr;
     }
 }
 
-void print_content(char *file, uint32 addr){
+uint32 find_file_addr(char *file_name, uint32 addr){
     CPIO_H *cpio=(CPIO_H*) addr;
     while(strncmp(cpio->c_magic,"070701\0",6)==1){
         int namesize=a16toi(cpio->c_namesize, 8);
@@ -61,19 +68,77 @@ void print_content(char *file, uint32 addr){
             temp[i]=name[i];
         }
         temp[namesize]='\0';
+        if(strncmp(temp, "TRAILER!!!", 10)) break;
         int filesize=a16toi(cpio->c_filesize, 8);
-        if(strcmp(file, temp)){
-            addr += (110+namesize);
-            char *w=(char*)addr;
-            while(filesize--){
-                if(*w=='\n') uart_write('\r');
-                else if(*w=='\0') return;
-                uart_write(*w++);
-            }
-            return;
+        if(strcmp(file_name, temp)){
+            return addr;
         }
-        addr+=(110+namesize+filesize);
+        int sum=110+namesize+filesize;
+        if(sum%4 != 0){
+            sum/=4;
+            sum*=4;
+            sum+=4;
+        }
+        addr+=sum;  // padding is included in namesize and filesize
         cpio=(CPIO_H*) addr;
     }
-    uart_printf("Not found file \"%s\"\n",file);
+    return NULL;
+}
+
+void* getContent(uint32 addr,int *length){
+    CPIO_H *cpio=(CPIO_H*) addr;
+    int namesize=a16toi(cpio->c_namesize, 8);
+    int filesize=a16toi(cpio->c_filesize, 8);
+    addr += (110+namesize);
+    *length = filesize;
+    return addr;
+}
+
+void print_content(char *file, uint32 addr){
+    uint32 f_addr=find_file_addr(file,addr);
+    if(f_addr != NULL){
+        int length;
+        char *content_addr = getContent(f_addr, &length);
+        while(length--){
+            if(*content_addr == '\n') uart_write('\r');
+            uart_write(*content_addr++);
+        }
+        return;
+    }else{
+        uart_printf("Not found file \"%s\"\n",file);
+        return;
+    }
+}
+
+void execute(char *file, uint32 addr){
+    uint32 f_addr=find_file_addr(file,addr);
+    if(f_addr != NULL){
+        int length;
+        byte *store_sp=simple_malloc(sizeof(byte));
+        byte *store_lr=simple_malloc(sizeof(byte));
+        uint32 address = getContent(f_addr, &length);
+        char *content_addr = address;
+        if(address%4 != 0){
+            address /= 4;
+            address *= 4;
+            address += 4;
+        }
+        asm volatile("mov  x1, sp\n"
+                     "str  x1, [%[input0]]\n"
+                     "str  lr, [%[input1]]\n"
+                     ::[input0] "r" (store_sp),
+                     [input1] "r" (store_lr));
+        void(*user_app)(void)= (void*) address;
+        asm volatile("blr  %[input0]\n"
+                     ::[input0] "r" (address));
+        asm volatile("ldr  x1, [%[input0]]\n"
+                     "mov  sp, x1\n"
+                     "ldr  lr, [%[input1]]\n"
+                     ::[input0] "r" (store_sp),
+                     [input1] "r" (store_lr));
+        return;
+    }else{
+        uart_printf("Not found file \"%s\"\n",file);
+        return;
+    }
 }

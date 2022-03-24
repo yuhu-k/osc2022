@@ -11,8 +11,10 @@ OBJSS = $(SRCSS:$(SRC_DIR)/%.S=$(DUM_DIR)/%.o)
 
 .PHONY: all clean run debug tty
 
-all: kernel8.img
+all: ../initramfs.cpio
 
+../initramfs.cpio: kernel8.img
+	cp kernel8.img ../rootfs/
 kernel8.img: $(DUM_DIR) $(OBJS) $(OBJSS) $(SRC_DIR)/linker.ld
 	$(tool_chain)ld -T $(SRC_DIR)/linker.ld -o kernel8.elf $(OBJS) $(DUM_DIR)/start.o
 	$(tool_chain)objcopy -O binary kernel8.elf kernel8.img

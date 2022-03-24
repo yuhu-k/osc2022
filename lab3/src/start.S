@@ -3,7 +3,7 @@
 
 .global _start
 .global from_el1_to_el0
-.global dd
+
 
 _start:
     // get cpu id
@@ -20,6 +20,7 @@ _start:
     ldr     x1, =_start
     mov     sp, x1
 
+
     // clear bss
     ldr     x1, =__bss_start
     ldr     x2, =__bss_size
@@ -27,9 +28,9 @@ _start:
     str     xzr, [x1], #8
     sub     x2, x2, #1
     cbnz    x2, 3b
-
+    
     bl      from_el2_to_el1
-
+    
     ldr     x1, =0x60000 // set stack pointer
     mov     sp, x1
 
@@ -50,23 +51,15 @@ from_el2_to_el1:
     msr     spsr_el2, x0
 
     msr     elr_el2, lr
-
+    
     eret
 
 from_el1_to_el0:
-    ldr     x1, =0x60000 // set stack pointer
-    mov     sp, x1
     // mask all interrupt, and set exception level to el0
     ldr     x1, =0x3c0
     msr     spsr_el1, x1
 
-    adr     x0, dd
-    msr     elr_el1, x0
+    msr     elr_el1, lr
 
     eret
 
-
-dd:
-    ldr     x1, =0x40000
-    mov     sp, x1
-    bl      main
