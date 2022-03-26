@@ -1,11 +1,7 @@
 #include "mini_uart.h"
-#include "mailbox.h"
 #define max_length 128
 
-extern unsigned char _data;
 int main() {
-    uart_init();  
-
     uart_write('H');
     uart_write('e');
     uart_write('l');
@@ -21,5 +17,5 @@ int main() {
     uart_write('!');
     uart_write('\r');
     uart_write('\n');
-    
+    return 0;
 }

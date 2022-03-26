@@ -14,7 +14,7 @@ OBJSS = $(SRCSS:$(SRC_DIR)/%.S=$(DUM_DIR)/%.o)
 all: kernel8.img sender
 
 kernel8.img: $(DUM_DIR) $(OBJS) $(OBJSS) $(SRC_DIR)/linker.ld
-	$(tool_chain)ld -T $(SRC_DIR)/linker.ld -o kernel8.elf $(OBJS) $(DUM_DIR)/start.o
+	$(tool_chain)ld -T $(SRC_DIR)/linker.ld -o kernel8.elf $(OBJS) $(OBJSS)
 	$(tool_chain)objcopy -O binary kernel8.elf kernel8.img
 
 $(DUM_DIR)/%.o: $(SRC_DIR)/%.S

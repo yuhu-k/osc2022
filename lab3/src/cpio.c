@@ -114,8 +114,6 @@ void execute(char *file, uint32 addr){
     uint32 f_addr=find_file_addr(file,addr);
     if(f_addr != NULL){
         int length;
-        byte *store_sp=simple_malloc(sizeof(byte));
-        byte *store_lr=simple_malloc(sizeof(byte));
         uint32 address = getContent(f_addr, &length);
         char *content_addr = address;
         if(address%4 != 0){
@@ -123,19 +121,13 @@ void execute(char *file, uint32 addr){
             address *= 4;
             address += 4;
         }
-        asm volatile("mov  x1, sp\n"
-                     "str  x1, [%[input0]]\n"
-                     "str  lr, [%[input1]]\n"
-                     ::[input0] "r" (store_sp),
-                     [input1] "r" (store_lr));
-        void(*user_app)(void)= (void*) address;
-        asm volatile("blr  %[input0]\n"
-                     ::[input0] "r" (address));
-        asm volatile("ldr  x1, [%[input0]]\n"
-                     "mov  sp, x1\n"
-                     "ldr  lr, [%[input1]]\n"
-                     ::[input0] "r" (store_sp),
-                     [input1] "r" (store_lr));
+        char* save_lr=simple_malloc(8);
+        asm volatile("mov     x1, %[input1]\n"
+                     "bl      from_el1_to_el0\n"
+                     :: [input1] "r" (address)
+                     );
+        /*void(*user_app)(void)= (void*) address;
+        user_app();*/
         return;
     }else{
         uart_printf("Not found file \"%s\"\n",file);

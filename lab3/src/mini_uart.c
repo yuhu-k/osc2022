@@ -5,7 +5,7 @@ void uart_init() {
     /* Initialize UART */
     *AUX_ENABLES |= 1;   // Enable mini UART
     *AUX_MU_CNTL = 0;    // Disable TX, RX during configuration
-    *AUX_MU_IER = 0;     // Disable interrupt
+    *AUX_MU_IER = 7;     // enable interrupt
     *AUX_MU_LCR = 3;     // Set the data size to 8 bit
     *AUX_MU_MCR = 0;     // Don't need auto flow control
     *AUX_MU_BAUD = 270;  // Set baud rate to 115200
@@ -39,6 +39,8 @@ void uart_init() {
 
     // 3. Enable TX, RX
     *AUX_MU_CNTL = 3;
+
+    
 }
 
 char uart_read() {

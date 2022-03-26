@@ -30,9 +30,7 @@ _start:
     cbnz    x2, 3b
     
     bl      from_el2_to_el1
-    
-    ldr     x1, =0x60000 // set stack pointer
-    mov     sp, x1
+
 
 4:  bl      main
     // halt this core if return
@@ -40,6 +38,11 @@ _start:
 
 
 from_el2_to_el1:
+    ldr     x1, =0x60000
+    msr     sp_el1, x1
+
+    ldr     x1, =0  //close MMU
+    msr     sctlr_el1, x1
 
     mov     x1, (0b11 << 20) // make el0, el1 can use Floating point and Advanced SIMD
     msr     CPACR_EL1, x1
@@ -55,11 +58,16 @@ from_el2_to_el1:
     eret
 
 from_el1_to_el0:
+    msr     elr_el1, x1
+    
+    ldr     x1, =0x40000
+    msr     sp_el0, x1
+
+    adr     x0, exception_vector_table
+    msr     vbar_el1, x0
     // mask all interrupt, and set exception level to el0
     ldr     x1, =0x3c0
     msr     spsr_el1, x1
 
-    msr     elr_el1, lr
 
     eret
-

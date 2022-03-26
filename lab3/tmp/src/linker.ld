@@ -1,8 +1,5 @@
-__heap_size = 0x400;
 SECTIONS
 {
-  . = 0x80000;
-  _begin_ = .;
   .text :
   {
     KEEP(*(.text.boot))
@@ -25,21 +22,10 @@ SECTIONS
     __bss_end = .;
   }
   . = ALIGN(4096);
-  _end_ = .;
   __sp__ = .;
   . = . + 8;
   __lr__ = .;
   . = . + 8;
-  _data = .;
-  .heap (NOLOAD):
-  {
-    . = . + 8;
-    __heap_start = .;
-    *(.heap*)
-    __HeapLimit = . + __heap_size;
-  }
+  . = ALIGN(4096);
 
 }
-
-__bss_size = (__bss_end - __bss_start) >> 3;
-__dtb_addr = 0x02080000;
