@@ -1,15 +1,18 @@
 #include "mini_uart.h"
 #include "irq.h"
+
+
 #define uart_puts uart_printf
 /**
  * common exception handler
  */
+
 void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, unsigned long spsr)
 {
     // print out interruption type
     switch(type%4) {
         case 0: uart_puts("Synchronous"); break;
-        case 1: handle_irq(); uart_puts("IRQ"); break;
+        case 1: if(handle_irq() == 1) return; uart_puts("IRQ"); break;
         case 2: uart_puts("FIQ"); break;
         case 3: uart_puts("SError"); break;
     }
@@ -56,7 +59,6 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
     uart_printf("0x%x",spsr>>32);
     uart_printf("0x%x",spsr);
     uart_puts("\n");
-    // no return from exception for now
-    //while(1);
-    err_han();
+    return;
 }
+

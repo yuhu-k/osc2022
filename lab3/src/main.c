@@ -2,6 +2,7 @@
 #include "shell.h"
 #include "mailbox.h"
 #include "irq.h"
+#include "timer.h"
 #define max_length 128
 
 //extern struct commands COM;
@@ -22,18 +23,16 @@ int main() {
     get_board_revision();
     get_arm_memory();
 
-
     irq_init_vectors();
     enable_interrupt_controller();
     irq_enable();
     
 
     asm volatile("bl core_timer_enable\n");
-    uart_printf("Time: %d ms\n",gettime());
-    for(int i=0;i<100;i++){
-        //asm volatile("bl core_timer_handler\n");
-        uart_printf("Time: %d ms\n",gettime());
-    }
+    //uart_printf("Time: %d ms\n",gettime());
+    
+    //timer_init();   //local timer
+
     
     while (1) {
         //char input[max_length];

@@ -52,6 +52,7 @@
     mrs x3, spsr_el1
     bl     exception_entry
     load_all
+    eret
 .endm
 
 .align 11 // vector table should be aligned to 0x800
