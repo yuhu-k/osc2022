@@ -63,7 +63,7 @@ from_el1_to_el0:
     ldr     x1, =0x40000
     msr     sp_el0, x1
 
-    adr     x0, exception_vector_table
+    adr     x0, exception_table
     msr     vbar_el1, x0
     // mask all interrupt, and set exception level to el0
     ldr     x1, =0x3c0

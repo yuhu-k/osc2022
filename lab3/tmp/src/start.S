@@ -7,10 +7,11 @@ _start:
     ldr     x1, =__lr__
     str     lr, [x1]
 
-2:  bl      main
+    ldr     x1, =__stack_start
+    mov     sp, x1
 
+2:  bl      main
 
     ldr     x1, =__lr__
     ldr     lr, [x1]
-3:  b       3b 
-
+    ret

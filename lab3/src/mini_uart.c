@@ -1,11 +1,22 @@
 #include "aux.h"
 #include "gpio.h"
+#include "buffer.h"
+#include "allocator.h"
+
+int transmit_interrupt_open = 0;
+char uart_buffer[1024];
+unsigned int wr_buffer_index = 0;
+unsigned int rd_buffer_index = 0;
+struct buffer wbuffer,rbuffer;
+
 
 void uart_init() {
+
     /* Initialize UART */
+    *AUX_IRQ |= 1;       // Enable mini UART interrupt pending
     *AUX_ENABLES |= 1;   // Enable mini UART
     *AUX_MU_CNTL = 0;    // Disable TX, RX during configuration
-    *AUX_MU_IER = 0xD;     // enable interrupt
+    *AUX_MU_IER = 1;     // enable interrupt
     *AUX_MU_LCR = 3;     // Set the data size to 8 bit
     *AUX_MU_MCR = 0;     // Don't need auto flow control
     *AUX_MU_BAUD = 270;  // Set baud rate to 115200
@@ -41,6 +52,13 @@ void uart_init() {
     *AUX_MU_CNTL = 3;
 
     
+}
+
+void uart_init_buffer(){
+    wbuffer.start = 0;
+    wbuffer.end = 0;
+    rbuffer.start = 0;
+    rbuffer.end = 0;
 }
 
 char uart_read() {
@@ -92,8 +110,8 @@ void uart_printf(char* fmt, ...) {
                 i16toa(arg,temp,8);
                 uart_printf(temp);
             }else if(*fmt == 'c'){
-                char *arg = __builtin_va_arg(args, char*);
-                uart_write(*arg);
+                unsigned char arg = __builtin_va_arg(args, unsigned char);
+                uart_write(arg);
             }
             else if(*fmt++ == 'l'){
                 if(*fmt == 'e'){
@@ -124,4 +142,43 @@ void uart_flush() {
     while (*AUX_MU_LSR & 0x01) {
         *AUX_MU_IO;
     }
+}
+
+int uart_push(char c){
+    return write_buffer(&wbuffer,c);
+}
+
+int uart_pop(unsigned char *c){
+    return read_buffer(&rbuffer,c);
+}
+
+void handle_uart_irq()
+{
+    unsigned int id = *AUX_MU_IIR;
+    if((id & 0x06) == 0x04)     //receive interrupt
+	{
+        if (*AUX_MU_IER == 1){
+            *AUX_MU_IER = 3;
+        }
+        if( *AUX_MU_LSR & 0x01) {
+            char c;
+            c = *AUX_MU_IO & 0xFF;
+            write_buffer(&rbuffer,c);
+            uart_read_line();
+        }
+	}
+    if((id & 0x06) == 0x02)   //transmit interrupt
+	{
+        if(*AUX_MU_LSR & 0x20) {
+            unsigned char c;
+            if(read_buffer(&wbuffer,&c) == 0) {
+                // close transmit interrupt
+                *AUX_MU_IER = 1; 
+                return;
+            }
+            *AUX_MU_IO = c;
+              
+        }
+	}
+    return;
 }

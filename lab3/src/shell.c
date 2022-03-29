@@ -8,30 +8,20 @@
 
 extern unsigned char __heap_start;
 uint32 cpio_start,cpio_end;
+char cmd_buffer[1024];
+unsigned int cmd_index = 0;
+unsigned int cmd_flag  = 0;
 
-/*struct commands{
-    char *command;
-    unsigned int length;
-    struct commands *last,*next;
-}*COM;
-
-struct commands* init_commands(){
-    struct commands *c;
-    c=simple_malloc(sizeof(struct commands));
-    c->length=0;
-    c->last=NULL;
-    c->next=NULL;
-    return c;
-}*/
 
 void shell_init(){
     uart_init();
+    uart_init_buffer();
     uart_flush();
     uart_printf("\n\nHello From RPI3\n");
     uint32 *heap = (uint32*)(&__heap_start-8);
     *heap &= 0x00000000;
     uint32 *ramf_start,*ramf_end;
-    /*ramf_start=find_property_value("/chosen\0","linux,initrd-start\0");  //get ramf start addr from dtb
+    ramf_start=find_property_value("/chosen\0","linux,initrd-start\0");  //get ramf start addr from dtb
     ramf_end=find_property_value("/chosen\0","linux,initrd-end\0"); //get ramf end addr from dtb
     if(ramf_start != 0){
         uart_printf("Ramf start: 0x%x\n",letobe(*ramf_start));
@@ -39,65 +29,42 @@ void shell_init(){
     }if(ramf_end != 0){
         uart_printf("Ramf end: 0x%x\n",letobe(*ramf_end));
         cpio_end=letobe(*ramf_end);
-    }*/
-    cpio_start = 0x8000000 ;
-    //COM=init_commands();
+    }
 }
 
-void uart_read_line(char *fmt){
-    char *store_fmt;
-    store_fmt=fmt;
-    //COM->command=fmt;
-
-    //struct commands* temp=COM;
-    uart_printf("# ");
-    //char t2[128];
-    //for(int i=0;i<128;i++) t2[i]=' ';
+void uart_read_line(){
     char in;
-    int i=0;
-    while(1){
-        in=uart_read();
-        if(in=='\n'){
+    while( uart_pop(&in) ){
+        if(cmd_flag == 0){
+            cmd_flag = 1;
+            cmd_index = 0;
+            for(int i=0;i<1024;i++) cmd_buffer[i]=0;
+        }
+        if(in == 13){
             uart_printf("\n");
-            break;
-        }/*else if( in == 'A' && store_fmt[i-1] == '['){
-            if(temp->last==NULL) continue;
-            uart_printf("\r%s\r# ",t2);
-            temp=temp->last;
-            store_fmt=temp->command;
-            i=temp->length;
-            //uart_printf("%s",store_fmt);
-        }else if( in == 'B' && store_fmt[i-1] == '['){
-            if(temp->next==NULL) continue;
-            uart_printf("\r%s\r# ",t2);
-            temp=temp->next;
-            store_fmt=temp->command;
-            i=temp->length;
-            //uart_printf("%s",store_fmt);
-        }*/else if((in==8 || in==127)){
-            if(i>0){
-                i--;
+            cmd_buffer[cmd_index++] = '\0';
+            cmd_flag = 0;
+            check(cmd_buffer);
+            uart_printf("# ");
+        }else if((in==8 || in==127)){
+            if(cmd_index>0){
+                cmd_index--;
                 char t[1]={8};
-                store_fmt[i]='\0';
-                uart_printf("%s %s",t,t);
+                cmd_buffer[cmd_index]='\0';
+                uart_write(8);
+                uart_write(' ');
+                uart_write(8);
             }
-            continue;
         }else if(in == 3){
-            for(int j=0;j<i;j++) store_fmt[j] &= 0x00;
-            uart_printf("^C\n# ");
-            i=0;
-            continue;
+                for(int j=0;j<cmd_index;j++) cmd_buffer[j] &= 0x00;
+                uart_printf("^C\n# ");
+                cmd_index=0;
         }else if( in>=32 && in<=126 ){
-            store_fmt[i++]=in;
-            uart_write(in);
+            cmd_buffer[cmd_index++]=in;
+            //uart_write(in);
+            uart_push(in);
         }
     }
-    store_fmt[i]='\0';
-
-    //strcpy(store_fmt,fmt,i+1);
-    /*COM->next=init_commands();
-    COM->next->last=COM;
-    COM=COM->next;*/
 }
 
 
@@ -143,14 +110,29 @@ void check(char *input){
         }
         execute(name,cpio_start);*/
         if(input[2] == '1')
-            execute("kernel8.img\0",cpio_start);
-        if(input[2] == '2')
             execute("program1.img\0",cpio_start);
-        if(input[2] == '3')
+        if(input[2] == '2')
             execute("program2.img\0",cpio_start);
-    }else if(strcmp(input,"time")){
-        
+    }else if(strncmp(input,"timer", 5)){
+        if(input[5]!=' '){
 
+        }else{
+            char name[128];
+            for(int i=0;i<128;i++) name[i] = 0;
+            int i;
+            for(i=6;input[i]>=46 && input[i]<=122  && i<128 && input[i]!='\0'; i++){
+                name[i-6]=input[i];
+            }
+            if(strncmp(name,"stop",4)){
+                core_timer_disable();
+            }
+            else if(strncmp(name,"start",5)){
+                core_timer_enable();
+            }
+        }
+    }else if(strncmp(input,"sleep", 5)){
+        sleep(5);
+        uart_printf("wake up!!");
     }else{
         uart_printf("command not found: %s\n",input);
     }

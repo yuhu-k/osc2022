@@ -1,6 +1,7 @@
 #include "mini_uart.h"
 #include "irq.h"
-
+#include "peripheral/irq.h"
+#include "timer.h"
 
 #define uart_puts uart_printf
 /**
@@ -12,7 +13,7 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
     // print out interruption type
     switch(type%4) {
         case 0: uart_puts("Synchronous"); break;
-        case 1: if(handle_irq() == 1) return; uart_puts("IRQ"); break;
+        case 1: if(handle_irq()) return; uart_puts("IRQ"); break;
         case 2: uart_puts("FIQ"); break;
         case 3: uart_puts("SError"); break;
     }
@@ -48,17 +49,40 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
             case 3: uart_puts(" at level 3"); break;
         }
     }
+
+    int ec = (esr >> 26) & 0b111111;
+    int iss = esr & 0x1FFFFFF;
+    int cntfrq_el0,cntpct_el0;
+    // system call
+    if (ec == 0b010101) {  
+        switch (iss) {
+            case 1:
+                uart_printf("Exception return address 0x%x\n", elr);
+                uart_printf("Exception class (EC) 0x%x\n", ec);
+                uart_printf("Instruction specific syndrome (ISS) 0x%x\n", iss);
+                break;
+            case 2:
+                core_timer_enable();
+                break;
+            case 3:
+                core_timer_disable();
+                break;
+            case 4:
+                asm volatile ("mrs %0, cntfrq_el0" : "=r" (cntfrq_el0)); // get current counter frequency
+                asm volatile ("mrs %0, cntpct_el0" : "=r" (cntpct_el0)); // read current counter
+                break;
+        }
+    }
     // dump registers
     uart_puts(":\n ESR_EL1 ");
-    uart_printf("0x%x",esr>>32);
+    uart_printf("0x%x ",esr>>32);
     uart_printf("0x%x",esr);
     uart_puts("\n ELR_EL1 ");
-    uart_printf("0x%x",elr>>32);
+    uart_printf("0x%x ",elr>>32);
     uart_printf("0x%x",elr);
     uart_puts("\n SPSR_EL1 ");
-    uart_printf("0x%x",spsr>>32);
+    uart_printf("0x%x ",spsr>>32);
     uart_printf("0x%x",spsr);
     uart_puts("\n");
-    return;
+    if (type%4 == 0) main();
 }
-

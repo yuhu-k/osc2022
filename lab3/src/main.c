@@ -13,7 +13,7 @@ int gettime(){
                  "mrs  %[input1], cntfrq_el0\n"
                  :[input0] "=r" (time), [input1] "=r" (freq));
     float temp=(float)time/freq;
-    int start_time= temp*1000, p_yet;
+    int start_time= temp*1000;
     return start_time;
 }
 
@@ -26,18 +26,11 @@ int main() {
     irq_init_vectors();
     enable_interrupt_controller();
     irq_enable();
-    
 
-    asm volatile("bl core_timer_enable\n");
-    //uart_printf("Time: %d ms\n",gettime());
-    
+    core_timer_enable();
     //timer_init();   //local timer
-
+    uart_printf("# ");
     
     while (1) {
-        //char input[max_length];
-        //for(int i=0;i<max_length;i++) input[i]&=0;
-        //uart_read_line(input);
-        //check(input);
     }
 }

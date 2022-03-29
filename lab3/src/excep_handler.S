@@ -1,6 +1,4 @@
 // save general registers to stack
-.global set_exception_vector_table
-
 .macro save_all
     sub sp, sp, 32 * 8
     stp x0, x1, [sp ,16 * 0]
@@ -19,7 +17,6 @@
     stp x26, x27, [sp ,16 * 13]
     stp x28, x29, [sp ,16 * 14]
     str x30, [sp, 16 * 15]
-
 .endm
 
 // load general registers from stack
@@ -56,8 +53,8 @@
 .endm
 
 .align 11 // vector table should be aligned to 0x800
-.global exception_vector_table
-exception_vector_table:
+.global exception_table
+exception_table:
   b sync_1// branch to a handler function.
   .align 7 // entry size is 0x80, .align will pad 0
   b irq_1

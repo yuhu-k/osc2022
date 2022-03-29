@@ -17,5 +17,6 @@ int main() {
     uart_write('!');
     uart_write('\r');
     uart_write('\n');
+    //uart_printf("This is test user program...\n");
     return 0;
 }
