@@ -15,6 +15,17 @@ void itoa(unsigned long long value,char *s) {
     s[idx] = '\0';
 }
 
+void ftoa(float *value, int precise, char *s) {
+    int temp=1;
+    for(int i=0;i<precise;i++) temp *= 10;
+    long long in = (*value)*temp;
+    char int_part[10],float_part[10];
+    itoa(in/temp,int_part);
+    itoa(in%temp,float_part); 
+    strccat(int_part,".\0",s);
+    strccat(s,float_part,s);
+}
+
 void i16toa(unsigned int value, char *s, int digits) {
     int idx = 0;
     char tmp[11];
@@ -82,4 +93,25 @@ uint32 letobe(uint32 o){
         result += temp[i];
     }
     return result;
+}
+
+void strccat(char* s1, char* s2, char* out){
+    int i=0,j=0;
+    for(;s1[i]>=32 && s1[i]<=127;i++){
+        out[i]=s1[i];
+    }
+    for(;s2[j]>=32 && s2[j]<=127;j++){
+        out[i+j]=s2[j];
+    }
+    out[i+j]=0;
+
+}
+
+int atoi(char *s){
+    int n=0;
+    for(int i=0;s[i]>=32 && s[i]<=127;i++){
+        n*=10;
+        n += s[i]-'0';
+    }
+    return n;
 }

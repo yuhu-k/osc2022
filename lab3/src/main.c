@@ -26,11 +26,9 @@ int main() {
     irq_init_vectors();
     enable_interrupt_controller();
     irq_enable();
-
-    core_timer_enable();
+    //core_timer_enable();
     //timer_init();   //local timer
     uart_printf("# ");
-    
-    while (1) {
+    while (1){
     }
 }

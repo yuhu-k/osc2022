@@ -51,6 +51,7 @@ void uart_init() {
     // 3. Enable TX, RX
     *AUX_MU_CNTL = 3;
 
+    transmit_interrupt_open = 0;
     
 }
 
@@ -112,6 +113,14 @@ void uart_printf(char* fmt, ...) {
             }else if(*fmt == 'c'){
                 unsigned char arg = __builtin_va_arg(args, unsigned char);
                 uart_write(arg);
+            }else if(*fmt == '.'){
+                int l = *(++fmt)-'0';
+                if(*(++fmt) == 'f'){
+                    float *arg = __builtin_va_arg(args, float*);
+                    char temp[20];
+                    ftoa(arg,l,temp);
+                    uart_printf(temp);
+                }            
             }
             else if(*fmt++ == 'l'){
                 if(*fmt == 'e'){
@@ -133,7 +142,7 @@ void uart_printf(char* fmt, ...) {
             fmt++;
             continue;
         }
-        else if(*fmt == '\0') break;
+        else if(!(*fmt >=32 && *fmt <= 127)) break;
         uart_write(*fmt++);
     }
 }
@@ -157,8 +166,9 @@ void handle_uart_irq()
     unsigned int id = *AUX_MU_IIR;
     if((id & 0x06) == 0x04)     //receive interrupt
 	{
-        if (*AUX_MU_IER == 1){
+        if (transmit_interrupt_open == 0){
             *AUX_MU_IER = 3;
+            transmit_interrupt_open = 1;
         }
         if( *AUX_MU_LSR & 0x01) {
             char c;
@@ -174,6 +184,7 @@ void handle_uart_irq()
             if(read_buffer(&wbuffer,&c) == 0) {
                 // close transmit interrupt
                 *AUX_MU_IER = 1; 
+                transmit_interrupt_open = 0;
                 return;
             }
             *AUX_MU_IO = c;

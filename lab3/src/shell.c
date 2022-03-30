@@ -44,7 +44,9 @@ void uart_read_line(){
             uart_printf("\n");
             cmd_buffer[cmd_index++] = '\0';
             cmd_flag = 0;
+            //asm volatile("msr DAIFClr, 0xf\n");
             check(cmd_buffer);
+            //asm volatile("msr DAIFSet, 0xf\n");
             uart_printf("# ");
         }else if((in==8 || in==127)){
             if(cmd_index>0){
@@ -115,7 +117,12 @@ void check(char *input){
             execute("program2.img\0",cpio_start);
     }else if(strncmp(input,"timer", 5)){
         if(input[5]!=' '){
-
+            int clock_hz,now_time,interval;
+            asm volatile("mrs %[input0], cntfrq_el0\n"
+                 "mrs %[input2], cntp_tval_el0\n"
+                 :[input0] "=r" (clock_hz),
+                  [input2] "=r" (interval));
+            uart_printf("%d\n", interval/clock_hz);
         }else{
             char name[128];
             for(int i=0;i<128;i++) name[i] = 0;
@@ -131,8 +138,9 @@ void check(char *input){
             }
         }
     }else if(strncmp(input,"sleep", 5)){
-        sleep(5);
-        uart_printf("wake up!!");
+        char time[5];
+        for(int i=0;i<5 && input[i+6]>=32 && input[i+6]<=127;i++) time[i] = input[i+6];
+        sleep(atoi(time));
     }else{
         uart_printf("command not found: %s\n",input);
     }

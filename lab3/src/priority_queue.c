@@ -5,7 +5,7 @@
 struct node *nodes = NULL;
 int num_of_nodes=0;
 
-int add_node(void (*callback_f)(),void* arguments,float times,float time_gap){
+int add_node(void (*callback_f)(),void* arguments,int times,int time_gap){
     
     struct node *node = simple_malloc(sizeof(struct node));
     node->time_to_ring = times;
@@ -15,7 +15,8 @@ int add_node(void (*callback_f)(),void* arguments,float times,float time_gap){
 
     if(nodes == NULL){
         nodes = node;
-    }else if(nodes->time_to_ring - time_gap >= times){
+    }else if( time_gap >= times){
+        time_gap = nodes->time_to_ring-time_gap;
         nodes->time_to_ring -= time_gap;
         node->next = nodes;
         nodes = node;
@@ -48,6 +49,7 @@ int add_node(void (*callback_f)(),void* arguments,float times,float time_gap){
         }
     }
     num_of_nodes++;
+    return nodes->time_to_ring;
 }
 
 struct node* delete_first_node(){
@@ -60,8 +62,5 @@ struct node* delete_first_node(){
         temp = temp->next;
     }
     num_of_nodes--;
-    if(num_of_nodes == 0){
-        return NULL;
-    }
     return t;
 }

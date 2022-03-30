@@ -42,6 +42,7 @@
 .endm
 
 .macro exception_handler type
+    msr DAIFSet, 0xf
     save_all
     mov x0, #\type
     mrs x1, esr_el1
@@ -49,6 +50,7 @@
     mrs x3, spsr_el1
     bl     exception_entry
     load_all
+    msr DAIFClr, 0xf
     eret
 .endm
 
