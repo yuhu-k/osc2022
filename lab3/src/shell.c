@@ -44,9 +44,7 @@ void uart_read_line(){
             uart_printf("\n");
             cmd_buffer[cmd_index++] = '\0';
             cmd_flag = 0;
-            //asm volatile("msr DAIFClr, 0xf\n");
             check(cmd_buffer);
-            //asm volatile("msr DAIFSet, 0xf\n");
             uart_printf("# ");
         }else if((in==8 || in==127)){
             if(cmd_index>0){

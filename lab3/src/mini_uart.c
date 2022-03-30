@@ -161,25 +161,25 @@ int uart_pop(unsigned char *c){
     return read_buffer(&rbuffer,c);
 }
 
-void handle_uart_irq()
+void *handle_uart_irq()
 {
     unsigned int id = *AUX_MU_IIR;
     if((id & 0x06) == 0x04)     //receive interrupt
 	{
-        if (transmit_interrupt_open == 0){
-            *AUX_MU_IER = 3;
-            transmit_interrupt_open = 1;
-        }
         if( *AUX_MU_LSR & 0x01) {
             char c;
             c = *AUX_MU_IO & 0xFF;
             write_buffer(&rbuffer,c);
             uart_read_line();
         }
+        if (*AUX_MU_IER & 2 == 0){
+            *AUX_MU_IER = 3;
+            transmit_interrupt_open = 1;
+        }
 	}
     if((id & 0x06) == 0x02)   //transmit interrupt
 	{
-        if(*AUX_MU_LSR & 0x20) {
+        while(*AUX_MU_LSR & 0x20) {
             unsigned char c;
             if(read_buffer(&wbuffer,&c) == 0) {
                 // close transmit interrupt
@@ -188,8 +188,8 @@ void handle_uart_irq()
                 return;
             }
             *AUX_MU_IO = c;
-              
         }
 	}
+    *AUX_MU_IER = 3;
     return;
 }

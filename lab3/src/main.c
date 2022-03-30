@@ -3,9 +3,11 @@
 #include "mailbox.h"
 #include "irq.h"
 #include "timer.h"
+#include "uint.h"
+#include "interrupt_queue.h"
+#include "aux.h"
 #define max_length 128
 
-//extern struct commands COM;
 
 int gettime(){
     int time,freq;
@@ -30,5 +32,11 @@ int main() {
     //timer_init();   //local timer
     uart_printf("# ");
     while (1){
+        if(!task_empty()){
+            exe_first_task();
+        }
+        else{
+            //uart_printf("0x%x\n",*AUX_MU_IER);
+        }
     }
 }

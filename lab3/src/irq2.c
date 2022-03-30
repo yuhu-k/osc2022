@@ -4,6 +4,7 @@
 #include "aux.h"
 #include "timer.h"
 #include "gpio.h"
+#include "interrupt_queue.h"
 
 void irq_init_vectors(){
     asm volatile("ldr     x0, =exception_table\n"
@@ -22,12 +23,14 @@ int handle_irq() {
     irq = irq0_pending_1;
     if (*irq & (1 << 29)) {
         *irq &= ~(1 << 29);
-        handle_uart_irq();
+        *AUX_MU_IER = 0;
+        push_queue(handle_uart_irq);
         return 1;
     }
     if (*core_irq & 2) {
         *irq &= ~2;
-        arm_core_timer_intr_handler();
+        core_timer_disable();
+        push_queue(arm_core_timer_intr_handler);
         return 1;
     }
     return 0;
