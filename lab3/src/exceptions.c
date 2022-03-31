@@ -2,6 +2,7 @@
 #include "irq.h"
 #include "peripheral/irq.h"
 #include "timer.h"
+#include "interrupt_queue.h"
 
 #define uart_puts uart_printf
 /**
@@ -13,7 +14,7 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
     // print out interruption type
     switch(type%4) {
         case 0: uart_puts("Synchronous"); break;
-        case 1: if(handle_irq()) return; uart_puts("IRQ"); break;
+        case 1: handle_irq(); exe_first_task(); return; uart_puts("IRQ"); break;
         case 2: uart_puts("FIQ"); break;
         case 3: uart_puts("SError"); break;
     }

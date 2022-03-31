@@ -169,13 +169,19 @@ void *handle_uart_irq()
         if( *AUX_MU_LSR & 0x01) {
             char c;
             c = *AUX_MU_IO & 0xFF;
-            write_buffer(&rbuffer,c);
-            uart_read_line();
+            if(c == 3){
+                uart_printf("^C\n");
+                reset_flag();
+                asm volatile("b  uart_read_line\n");
+            }else{
+                write_buffer(&rbuffer,c);
+                //uart_read_line();
+            }
         }
-        if (*AUX_MU_IER & 2 == 0){
+        /*if (*AUX_MU_IER & 2 == 0){
             *AUX_MU_IER = 3;
             transmit_interrupt_open = 1;
-        }
+        }*/
 	}
     if((id & 0x06) == 0x02)   //transmit interrupt
 	{
@@ -190,6 +196,6 @@ void *handle_uart_irq()
             *AUX_MU_IO = c;
         }
 	}
-    *AUX_MU_IER = 3;
+    *AUX_MU_IER = 1;
     return;
 }

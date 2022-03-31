@@ -20,6 +20,7 @@ int gettime(){
 }
 
 int main() {
+    uart_printf("\n\nHello From RPI3\n");
     shell_init();
     uart_printf("Initial completed\n");
     get_board_revision();
@@ -28,15 +29,11 @@ int main() {
     irq_init_vectors();
     enable_interrupt_controller();
     irq_enable();
+
     //core_timer_enable();
     //timer_init();   //local timer
-    uart_printf("# ");
     while (1){
-        if(!task_empty()){
-            exe_first_task();
-        }
-        else{
-            //uart_printf("0x%x\n",*AUX_MU_IER);
-        }
+        uart_read_line();
+        //exe_first_task();
     }
 }

@@ -122,12 +122,7 @@ void execute(char *file, uint32 addr){
             address += 4;
         }
         char* save_lr=simple_malloc(8);
-        asm volatile("mov     x1, %[input1]\n"
-                     "bl      from_el1_to_el0\n"
-                     :: [input1] "r" (address)
-                     );
-        /*void(*user_app)(void)= (void*) address;
-        user_app();*/
+        from_el1_to_el0(address);
         return;
     }else{
         uart_printf("Not found file \"%s\"\n",file);

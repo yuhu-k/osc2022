@@ -1,4 +1,5 @@
 #include "interrupt_queue.h"
+#include "aux.h"
 #include "allocator.h"
 
 struct interrupt_event *task_controller = NULL;
@@ -25,7 +26,9 @@ int task_empty(){
 }
 
 void exe_first_task(){
-    if(task_controller == NULL) return;
+    if(task_controller == NULL){ return;}
     task_controller->callback();
+    *AUX_MU_IER |= 1;
     task_controller = task_controller->next;
+    exe_first_task();
 }
