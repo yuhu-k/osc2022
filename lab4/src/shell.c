@@ -176,6 +176,8 @@ void check(char *input){
                 m[i] = m[i+1];
             }
             m[9] = NULL;
+        }else if(input[5] == 's'){
+            pool_status();
         }
     }else{
         uart_printf("command not found: %s\n",input);
