@@ -15,12 +15,14 @@ unsigned int cmd_flag  = 0;
 
 
 void shell_init(){
+    uint32 *heap = (uint32*)(&__heap_start-8);
+    *heap &= 0x00000000;
     uart_init();
+    uart_printf("\n\n\nHello From RPI3\n");
     uart_init_buffer();
     uart_flush();
     core_timer_disable();
-    uint32 *heap = (uint32*)(&__heap_start-8);
-    *heap &= 0x00000000;
+    init_allocator();
     uint32 *ramf_start,*ramf_end;
     ramf_start=find_property_value("/chosen\0","linux,initrd-start\0");  //get ramf start addr from dtb
     ramf_end=find_property_value("/chosen\0","linux,initrd-end\0"); //get ramf end addr from dtb
@@ -80,7 +82,7 @@ void uart_read_line(){
     }
 }
 
-
+void* m[10];
 
 void check(char *input){
     if(input[0] == '\0' || input[0] == '\n') return;
@@ -154,6 +156,27 @@ void check(char *input){
         char time[5];
         for(int i=0;i<5 && input[i+6]>=32 && input[i+6]<=127;i++) time[i] = input[i+6];
         sleep(atoi(time));
+    }else if(strcmp(input,"mem")){
+        if(input[4] != '-')
+            show_status();
+        else if(input[5] == 'a'){
+            char size[128];
+            for(int i=0;input[i+7]<='9' && input[i+7]>='0' && i<121;i++){
+                size[i] = input[i+7];
+                size[i+1]='\0';
+            }
+            int SIZE = atoi(size);
+            for(int i=9;i>0;i--){
+                m[i] = m[i-1];
+            }
+            m[0] = malloc(SIZE);
+        }else if(input[5] == 'd'){
+            free(m[0]);
+            for(int i=0;i<9;i++){
+                m[i] = m[i+1];
+            }
+            m[9] = NULL;
+        }
     }else{
         uart_printf("command not found: %s\n",input);
     }

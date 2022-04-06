@@ -27,15 +27,19 @@ SECTIONS
   . = ALIGN(4096);
   _end_ = .;
 
-  .heap (NOLOAD):
+  . = . + 0x100000;
+
+  .heap :
   {
-    . = . + 8;
     __heap_start = .;
+
     *(.heap*)
+
     __HeapLimit = . + __heap_size;
+
+    . = ALIGN(4096);
   }
 
 }
-
 __bss_size = (__bss_end - __bss_start) >> 3;
 __dtb_addr = 0x02080000;

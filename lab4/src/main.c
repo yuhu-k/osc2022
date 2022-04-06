@@ -20,7 +20,7 @@ int gettime(){
 }
 
 int main() {
-    uart_printf("\n\nHello From RPI3\n");
+
     shell_init();
     uart_printf("Initial completed\n");
     get_board_revision();
