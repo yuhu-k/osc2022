@@ -2,11 +2,13 @@
 #include "mini_uart.h"
 #include "allocator.h"
 #include "math.h"
-#define base_addr 0x10000000
-#define end_addr 0x20000000
+#include "dtb.h"
+#include "string.h"
 #define page_size 4096    //4KB
 extern unsigned char __heap_start;
 
+uint32 base_addr;
+uint32 end_addr;
 
 uint32 frame_num;
 
@@ -46,6 +48,11 @@ void init_allocator(){
     }
     pool = NULL;
     MR_pool = NULL;
+    uint32 *b,*e;
+    b = find_property_value("/memory@0\0","reg\0");
+    base_addr = letobe(*b);
+    end_addr = letobe(*(b+1));
+    uart_printf("0x%x 0x%x\n",base_addr, end_addr);
 }
 
 void* page_alloc(unsigned int page_n){
@@ -287,7 +294,39 @@ void clear_pool(){
 }
 
 void memory_reserve(uint32 start,uint32 end){
+    if(end < start) return;
     struct mem_reserved_pool *tmp;
+    tmp = MR_pool;
+    if(tmp != NULL){
+        if(start >= tmp->start && start <= tmp->end){
+            if(end > tmp->end){tmp->end = end;
+                MR_pool = MR_pool->next;
+                return memory_reserve(tmp->start,tmp->end);
+            }
+            return;
+        }else if(end >= tmp->start && end <= tmp->end){
+            tmp->start = start;
+            MR_pool = MR_pool->next;
+            return memory_reserve(tmp->start,tmp->end);
+        }
+    }
+    while(tmp != NULL && tmp->next != NULL){
+        if(start >= tmp->next->start && start <= tmp->next->end){
+            if(end > tmp->next->end){
+                tmp->next->end = end;
+                struct mem_reserved_pool *tmp2 = tmp->next;
+                tmp->next = tmp2->next;
+                return memory_reserve(tmp2->start,tmp2->end);
+            }
+            return;
+        }else if(end >= tmp->next->start && end <= tmp->next->end){
+            tmp->next->start = start;
+            struct mem_reserved_pool *tmp2 = tmp->next;
+            tmp->next = tmp2->next;
+            return memory_reserve(tmp2->start,tmp2->end);
+        }
+        tmp = tmp->next;
+    }
     tmp = simple_malloc(sizeof(struct mem_reserved_pool));
     tmp->start = start;
     tmp->end = end;

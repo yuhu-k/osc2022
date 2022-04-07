@@ -1,4 +1,4 @@
-__heap_size = 0x400;
+__heap_size = 0x100000;
 SECTIONS
 {
   . = 0x80000;
@@ -25,7 +25,6 @@ SECTIONS
     __bss_end = .;
   }
   . = ALIGN(4096);
-  _end_ = .;
 
   . = . + 0x100000;
 
@@ -37,8 +36,12 @@ SECTIONS
 
     __HeapLimit = . + __heap_size;
 
+    . = . + __heap_size;
+    
     . = ALIGN(4096);
   }
+
+  _end_ = .;
 
 }
 __bss_size = (__bss_end - __bss_start) >> 3;

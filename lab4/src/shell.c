@@ -7,7 +7,8 @@
 #include "aux.h"
 
 
-extern unsigned char __heap_start;
+extern unsigned char __heap_start, _end_, _begin_;
+extern byte __dtb_addr;
 uint32 cpio_start,cpio_end;
 char cmd_buffer[1024];
 unsigned int cmd_index = 0;
@@ -33,6 +34,17 @@ void shell_init(){
         uart_printf("Ramf end: 0x%x\n",letobe(*ramf_end));
         cpio_end=letobe(*ramf_end);
     }
+    memory_reserve(0x0,0x1000);  //Spin tables for multicore boot
+    
+    memory_reserve(cpio_start,cpio_end);  //Initramfs
+
+    memory_reserve(&_begin_,&_end_);  //Kernel image in the physical memory and simple allocator
+
+    uint32 *addr = &__dtb_addr;
+
+    memory_reserve(*addr,*addr + 0x100000); //Device tree
+
+    memory_reserve(0x0,0x80000);  //Kernel stack
 }
 
 void reset_flag(){

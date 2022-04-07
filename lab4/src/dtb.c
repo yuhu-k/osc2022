@@ -134,7 +134,9 @@ void print_properties(device_prop* node, int level){
             uint32 *temp=node->prop_content.prop_value;
             uart_printf("<%d>\n",letobe(temp[0]));
         }else if(strcmp(node->prop_content.prop_name,"linux,initrd-end\0") ||
-         strcmp(node->prop_content.prop_name,"linux,initrd-start\0")){
+         strcmp(node->prop_content.prop_name,"linux,serial\0") ||
+         strcmp(node->prop_content.prop_name,"linux,initrd-start\0") ||
+         strcmp(node->prop_content.prop_name,"linux,revision\0")){
             uint32 *temp=node->prop_content.prop_value;
             uart_printf("0x%x\n",letobe(temp[0]));
         }else if(strcmp(node->prop_content.prop_name,"size\0") ||
