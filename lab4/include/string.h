@@ -7,3 +7,4 @@ void strcpy(char *string1, char* string2, int length);
 unsigned int letobe(unsigned int o);
 void strccat(char *string1, char* string2, char *string_out);
 int atoi(char *s);
+int a16toi(char *s);

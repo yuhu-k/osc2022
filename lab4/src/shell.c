@@ -181,6 +181,39 @@ void check(char *input){
         }else if(input[5] == 'c'){
             clear_pool();
         }
+        else if(input[5] == 'r'){
+            char start[128];
+            int padding=7, ishex=0;
+            int s,e;
+            if(input[7] == '0' && input[8] == 'x'){
+                padding+=2;
+                ishex = 1;
+            }
+            int i;
+            for(i=0;input[i+padding]<=127 && input[i+padding]>=48 && i<121;i++){
+                start[i] = input[i+padding];
+                start[i+1]='\0';
+            }
+            if(ishex)
+                s=a16toi(start);
+            else
+                s=atoi(start);
+            padding += i+1;
+            ishex = 0;
+            if(input[padding] == '0' && input[padding+1] == 'x'){
+                padding+=2;
+                ishex = 1;
+            }
+            for(i=0;input[i+padding]<=127 && input[i+padding]>=48 && i<121;i++){
+                start[i] = input[i+padding];
+                start[i+1]='\0';
+            }
+            if(ishex)
+                e=a16toi(start);
+            else
+                e=atoi(start);
+            memory_reserve(s,e);
+        }
     }else{
         uart_printf("command not found: %s\n",input);
     }

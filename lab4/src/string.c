@@ -115,3 +115,30 @@ int atoi(char *s){
     }
     return n;
 }
+
+int a16toi(char *s){
+    int n=0;
+    for(int i=0;(s[i]>='0' && s[i]<='9') || (s[i]>='A' && s[i]<='F') || (s[i]>='a' && s[i]<='f');i++){
+        n*=16;
+        if(s[i]>='0' && s[i]<='9')
+            n += s[i]-'0';
+        else if(s[i]>='A' && s[i]<='F')
+            n += s[i]-'A';
+        else if(s[i]>='a' && s[i]<='f')
+            n += s[i]-'a';
+    }
+    return n;
+}
+
+int a16ntoi(char *num, int length){  // transform hex string to int
+    int namesize=0;
+    for(int i=0;i<length;i++){
+        namesize <<= 4;
+        if(num[i]>='0' && num[i]<='9'){
+            namesize += (num[i]-'0');
+        }else if(num[i]>='A' && num[i]<='F'){
+            namesize += (num[i]-'A'+10);
+        }
+    }
+    return namesize;
+}

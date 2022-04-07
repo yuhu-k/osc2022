@@ -19,23 +19,11 @@ typedef struct cpio_newc_header {  //cpio new ascii struct
 		   char	   c_check[8];
 }CPIO_H ;
 
-int a16toi(char *num, int length){  // transform hex string to int
-    int namesize=0;
-    for(int i=0;i<length;i++){
-        namesize <<= 4;
-        if(num[i]>='0' && num[i]<='9'){
-            namesize += (num[i]-'0');
-        }else if(num[i]>='A' && num[i]<='F'){
-            namesize += (num[i]-'A'+10);
-        }
-    }
-    return namesize;
-}
 
 void list(uint32 addr){ // proceed ls
     CPIO_H *cpio=(CPIO_H*) addr;
     while(strncmp(cpio->c_magic,"070701\0",6)==1){ //c_magic is always "070701"
-        int namesize=a16toi(cpio->c_namesize, 8);
+        int namesize=a16ntoi(cpio->c_namesize, 8);
         char *name=(char*)(cpio+1);
         char temp[128];
         for(int i=0;i<namesize;i++){
@@ -43,7 +31,7 @@ void list(uint32 addr){ // proceed ls
         }
         temp[namesize]='\0';
         if(strncmp(temp, "TRAILER!!!", 10)) return;
-        int filesize=a16toi(cpio->c_filesize, 8);
+        int filesize=a16ntoi(cpio->c_filesize, 8);
         uart_printf("%s\n",temp);
 
         int sum=110+namesize+filesize;
@@ -61,7 +49,7 @@ void list(uint32 addr){ // proceed ls
 uint32 find_file_addr(char *file_name, uint32 addr){
     CPIO_H *cpio=(CPIO_H*) addr;
     while(strncmp(cpio->c_magic,"070701\0",6)==1){
-        int namesize=a16toi(cpio->c_namesize, 8);
+        int namesize=a16ntoi(cpio->c_namesize, 8);
         char *name=(char*)(cpio+1);
         char temp[128];
         for(int i=0;i<namesize;i++){
@@ -69,7 +57,7 @@ uint32 find_file_addr(char *file_name, uint32 addr){
         }
         temp[namesize]='\0';
         if(strncmp(temp, "TRAILER!!!", 10)) break;
-        int filesize=a16toi(cpio->c_filesize, 8);
+        int filesize=a16ntoi(cpio->c_filesize, 8);
         if(strcmp(file_name, temp)){
             return addr;
         }
@@ -87,8 +75,8 @@ uint32 find_file_addr(char *file_name, uint32 addr){
 
 void* getContent(uint32 addr,int *length){
     CPIO_H *cpio=(CPIO_H*) addr;
-    int namesize=a16toi(cpio->c_namesize, 8);
-    int filesize=a16toi(cpio->c_filesize, 8);
+    int namesize=a16ntoi(cpio->c_namesize, 8);
+    int filesize=a16ntoi(cpio->c_filesize, 8);
     addr += (110+namesize);
     *length = filesize;
     return addr;

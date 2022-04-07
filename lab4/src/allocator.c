@@ -16,6 +16,7 @@ struct FrameArray* frame_array;
 struct mem_frag *pool;
 struct mem_frag *in_used_pool;
 
+struct mem_reserved_pool *MR_pool;
 
 
 void* simple_malloc(unsigned int size) {
@@ -44,11 +45,24 @@ void init_allocator(){
         frame_list[i] = NULL;
     }
     pool = NULL;
+    MR_pool = NULL;
 }
 
 void* page_alloc(unsigned int page_n){
     int logarithm = log2(page_n);
-    return getbestfit(logarithm);
+    struct mem_reserved_pool* f1;
+    while(1){
+        void* addr = getbestfit(logarithm);
+        
+        f1 = MR_pool;
+        while(f1 != NULL){
+            if(addr >= f1->start && addr <= f1->end){
+                break;
+            }
+            f1 = f1->next;
+        }
+        if(f1 == NULL) return addr;
+    }
 }
 
 void* getbestfit(int ind){
@@ -232,6 +246,12 @@ void pool_status(){
         uart_printf("  %d: addr: 0x%x size: %d\n",i,f->start,f->size);
         f = f->next;
     }
+    struct mem_reserved_pool* f1 = MR_pool;
+    uart_printf("Reserved pool:\n");
+    for(int i=1;f1!=NULL;i++){
+        uart_printf("  %d: addr: 0x%x to 0x%x\n",i,f1->start,f1->end);
+        f1 = f1->next;
+    }
 }
 
 void free(void* addr){
@@ -264,4 +284,13 @@ void clear_pool(){
         page_free(in_used_pool->start);
         in_used_pool = in_used_pool->next;
     }
+}
+
+void memory_reserve(uint32 start,uint32 end){
+    struct mem_reserved_pool *tmp;
+    tmp = simple_malloc(sizeof(struct mem_reserved_pool));
+    tmp->start = start;
+    tmp->end = end;
+    tmp->next = MR_pool;
+    MR_pool = tmp;
 }

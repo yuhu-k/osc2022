@@ -7,6 +7,7 @@ void init_allocator();
 void free(void* address);
 void pool_status();
 void clear_pool();
+void memory_reserve(uint32 start,uint32 end);
 
 struct FrameArray{
     int val, index;
@@ -18,4 +19,9 @@ struct mem_frag{
     void* start;
     struct mem_frag *next;
     int size;
+};
+
+struct mem_reserved_pool{
+    void* start, *end;
+    struct mem_reserved_pool *next;
 };
