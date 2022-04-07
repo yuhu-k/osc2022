@@ -2,12 +2,14 @@
 #include "gpio.h"
 #include "buffer.h"
 #include "allocator.h"
+#include "jump.h"
 
 int transmit_interrupt_open = 0;
 char uart_buffer[1024];
 unsigned int wr_buffer_index = 0;
 unsigned int rd_buffer_index = 0;
 struct buffer wbuffer,rbuffer;
+extern struct jumpBuf jb;
 
 
 void uart_init() {
@@ -172,7 +174,8 @@ void *handle_uart_irq()
             if(c == 3){
                 uart_printf("^C\n");
                 reset_flag();
-                asm volatile("b  uart_read_line\n");
+                //asm volatile("b  uart_read_line\n");
+                longjump(&jb,1);
             }else{
                 write_buffer(&rbuffer,c);
                 //uart_read_line();

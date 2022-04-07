@@ -178,6 +178,8 @@ void check(char *input){
             m[9] = NULL;
         }else if(input[5] == 's'){
             pool_status();
+        }else if(input[5] == 'c'){
+            clear_pool();
         }
     }else{
         uart_printf("command not found: %s\n",input);

@@ -94,7 +94,7 @@ void show_status(){
 void page_free(void* var){
     struct FrameArray* tmp = var;
     int index = ((int)var - base_addr) / page_size;
-    if( frame_array[index].allocatable == 1 ) return;
+    if( frame_array[index].allocatable == 1 || ((int)var - base_addr) % page_size != 0) return;
     else{
         frame_array[index].allocatable = 1;
         merge(index);
@@ -102,7 +102,6 @@ void page_free(void* var){
 }
 
 void merge(int index){
-    uart_printf("%d\n",index);
     int length = frame_array[index].val;
     int front,back;
     if(index == 0){
@@ -256,3 +255,13 @@ void free(void* addr){
     }
 }
 
+void clear_pool(){
+    while(pool!=NULL){
+        page_free(pool->start);
+        pool = pool->next;
+    }
+    while(in_used_pool!=NULL){
+        page_free(in_used_pool->start);
+        in_used_pool = in_used_pool->next;
+    }
+}

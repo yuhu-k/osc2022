@@ -6,6 +6,7 @@ void show_status();
 void init_allocator();
 void free(void* address);
 void pool_status();
+void clear_pool();
 
 struct FrameArray{
     int val, index;
