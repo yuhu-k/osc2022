@@ -29,6 +29,10 @@ void* simple_malloc(unsigned int size) {
 }
 
 void init_allocator(){
+    uint32 *b,*e;
+    b = find_property_value("/memory@0\0","reg\0");
+    base_addr = letobe(*b);
+    end_addr = letobe(*(b+1));
     frame_num = (end_addr - base_addr)/page_size;
     frame_array = simple_malloc(frame_num * sizeof(struct FrameArray));
     frame_array[0].val = log2(frame_num);
@@ -48,11 +52,6 @@ void init_allocator(){
     }
     pool = NULL;
     MR_pool = NULL;
-    uint32 *b,*e;
-    b = find_property_value("/memory@0\0","reg\0");
-    base_addr = letobe(*b);
-    end_addr = letobe(*(b+1));
-    uart_printf("0x%x 0x%x\n",base_addr, end_addr);
 }
 
 void* page_alloc(unsigned int page_n){
@@ -60,7 +59,6 @@ void* page_alloc(unsigned int page_n){
     struct mem_reserved_pool* f1;
     while(1){
         void* addr = getbestfit(logarithm);
-        
         f1 = MR_pool;
         while(f1 != NULL){
             if(addr >= f1->start && addr <= f1->end){
@@ -90,12 +88,10 @@ void* getbestfit(int ind){
         frame_list[(int)log2(frame_num)-ind-i] = tmp;
     }
 
-
     struct FrameArray* tmp = frame_list[(int)log2(frame_num)-ind];
     frame_list[(int)log2(frame_num)-ind] = (frame_list[(int)log2(frame_num)-ind])->next;
     tmp->allocatable = 0;
     tmp->next = NULL;
-
     return (void*)(base_addr + page_size*tmp->index);
 }
 

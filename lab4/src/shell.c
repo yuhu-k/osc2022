@@ -182,12 +182,14 @@ void check(char *input){
                 m[i] = m[i-1];
             }
             m[0] = malloc(SIZE);
+            uart_printf("Allocate address: 0x%x\n",m[0]);
         }else if(input[5] == 'd'){
             free(m[0]);
             for(int i=0;i<9;i++){
                 m[i] = m[i+1];
             }
             m[9] = NULL;
+            uart_printf("Address 0x%x had been free.\n",m[0]);
         }else if(input[5] == 's'){
             pool_status();
         }else if(input[5] == 'c'){
@@ -225,6 +227,7 @@ void check(char *input){
             else
                 e=atoi(start);
             memory_reserve(s,e);
+            uart_printf("Address 0x%x to 0x%x is reserved.\n",s,e);
         }
     }else{
         uart_printf("command not found: %s\n",input);
