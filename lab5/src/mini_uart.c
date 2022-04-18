@@ -113,7 +113,7 @@ void uart_printf(char* fmt, ...) {
                 i16toa(arg,temp,8);
                 uart_printf(temp);
             }else if(*fmt == 'c'){
-                unsigned char arg = __builtin_va_arg(args, unsigned char);
+                unsigned char arg = __builtin_va_arg(args,int);
                 uart_write(arg);
             }else if(*fmt == '.'){
                 int l = *(++fmt)-'0';

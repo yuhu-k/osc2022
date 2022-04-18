@@ -18,20 +18,21 @@ kernel8.img: $(DUM_DIR) $(OBJS) $(OBJSS) $(SRC_DIR)/linker.ld
 	$(tool_chain)objcopy -O binary kernel8.elf kernel8.img
 
 $(DUM_DIR)/%.o: $(SRC_DIR)/%.S
-	$(tool_chain)gcc -g -Wall -I include -c $< -o $@
+	$(tool_chain)gcc-10 -g -Wall -I include -c $< -o $@
 
 $(DUM_DIR)/%.o: $(SRC_DIR)/%.c
-	$(tool_chain)gcc -g -Wall -I include -c $< -o $@ -fno-stack-protector
+	$(tool_chain)gcc-10 -g -Wall -I include -c $< -o $@ -fno-stack-protector
 
 $(DUM_DIR): 
 	mkdir -p $(DUM_DIR)
 
 sender: sendfile.cpp
-	g++ sendfile.cpp -o sender
+	g++-11 sendfile.cpp -o sender
 
 clean:
 	rm -rf kernel8.*
 	rm -rf out
+	rm sender
 
 run: all
 	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial stdio -initrd initramfs.cpio -d int

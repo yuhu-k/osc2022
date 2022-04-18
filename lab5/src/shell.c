@@ -5,6 +5,14 @@
 #include "dtb.h"
 #include "allocator.h"
 #include "aux.h"
+#include "thread.h"
+#include "getopt.h"
+#include "scheduler.h"
+
+struct ARGS{
+    char** argv;
+    int argc;
+};
 
 
 extern unsigned char __heap_start, _end_, _begin_;
@@ -96,7 +104,36 @@ void uart_read_line(){
 
 void* m[10];
 
+struct ARGS* parse_command(char *command){
+    char** tmp = malloc(sizeof(char*)*16);
+    int p=0;
+    if(command[0] == 0) return NULL;
+    for(int i=0;command[i] != 0;i++){
+        if(command[i] == ' ') continue;
+        char *arg = malloc(sizeof(char[128]));
+        int p2=0;
+        for(;command[i] != 0 && command[i] != ' ' && command[i]>=32 && command[i]<=127 ;i++){
+            arg[p2++] = command[i];
+        }
+        arg[p2] = 0;
+        tmp[p++] = arg;
+        if(command[i] == 0) break;
+    }
+    struct ARGS* args;
+    args = malloc(sizeof(struct ARGS));
+    args->argc = p;
+    args->argv = tmp;
+    return args;
+}
+
+void temp_func(){
+    uart_printf("10\n");
+    schedule();
+    uart_printf("20\n");
+}
+
 void check(char *input){
+    struct ARGS *cmd = parse_command(input);
     if(input[0] == '\0' || input[0] == '\n') return;
     if(strcmp(input,"help")==1){
         uart_printf("help    : print the help menu\n");
@@ -229,7 +266,25 @@ void check(char *input){
             memory_reserve(s,e);
             uart_printf("Address 0x%x to 0x%x is reserved.\n",s,e);
         }
+    }else if(strcmp(cmd->argv[0],"thread")){
+        int t=1;
+        optind = 1;
+        while(t){
+            char c = getopt(cmd->argc,cmd->argv,":a:r");
+            switch (c){
+                case 'a':
+                    Thread(temp_func);
+                    break;
+                case 'r':
+                    schedule();
+                    break;
+                case 0:
+                    t=0;
+                    break;
+            }
+        }
     }else{
         uart_printf("command not found: %s\n",input);
     }
 }
+
