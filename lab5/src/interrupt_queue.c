@@ -7,10 +7,6 @@ struct interrupt_event *task_controller = NULL;
 void push_queue(void (*callback)()){
     struct interrupt_event *tmp = simple_malloc(sizeof(struct interrupt_event));
     tmp->callback = callback;
-    /*tmp->type = type;
-    tmp->esr = esr;
-    tmp->elr = elr;
-    tmp->spsr = spsr;*/
     tmp->next = NULL;
     if(task_controller == NULL){
         task_controller = tmp;
@@ -27,8 +23,9 @@ int task_empty(){
 
 void exe_first_task(){
     if(task_controller == NULL){ return;}
-    task_controller->callback();
-    *AUX_MU_IER |= 1;
+    struct interrupt_event* tmp = task_controller;
     task_controller = task_controller->next;
+    tmp->callback();
+    *AUX_MU_IER |= 1;
     exe_first_task();
 }

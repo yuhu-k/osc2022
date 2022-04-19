@@ -6,9 +6,6 @@ int bp;
 
 
 void arm_core_timer_intr_handler() {
-    /*asm volatile("mrs x0, cntfrq_el0\n"
-                 "msr cntp_tval_el0, x0\n");*/
-    core_timer_enable();
     core_timer_handler();
 }
 
