@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "getopt.h": "c",
-        "uint.h": "c"
+        "uint.h": "c",
+        "queue.h": "c"
     }
 }

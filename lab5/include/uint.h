@@ -10,5 +10,6 @@
 #define bool byte
 #define false 0
 #define true  1
+#define tid_t uint32
 
 #endif

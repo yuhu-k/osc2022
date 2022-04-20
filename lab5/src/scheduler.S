@@ -25,6 +25,31 @@ get_current:
     mrs x0, tpidr_el1
     ret
 
+.global store_and_jump
+store_and_jump:
+    stp x19, x20, [x0, 16 * 0]
+    stp x21, x22, [x0, 16 * 1]
+    stp x23, x24, [x0, 16 * 2]
+    stp x25, x26, [x0, 16 * 3]
+    stp x27, x28, [x0, 16 * 4]
+    stp fp, lr, [x0, 16 * 5]
+    mov x9, sp
+    str x9, [x0, 16 * 6]
+
+    sub sp, sp, 8
+    str lr, [sp, 8 * 0]
+
+    ldr x9, [x1, 8 * 0]
+
+    msr tpidr_el1, x1
+    blr x9
+    msr tpidr_el1, x0
+
+    ldr lr, [sp, 8 * 0]
+    add sp, sp, 8
+
+    ret
+
 .global set_current
 set_current:
     msr tpidr_el1, x0

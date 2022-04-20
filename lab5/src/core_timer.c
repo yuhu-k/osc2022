@@ -1,6 +1,8 @@
 #include "mini_uart.h"
 #include "uint.h"
 #include "priority_queue.h"
+#include "queue.h"
+#include "scheduler.h"
 
 int bp;
 
@@ -45,4 +47,9 @@ void sleep(int duration){
     uart_printf("Timer is set...\n");
 }
 
+void delay(int duration){
+    void *argu = push2waiting_queue();
+    add_timer(wakeup_queue,argu,duration);
+    schedule();
+}
 

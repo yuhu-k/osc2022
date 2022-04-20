@@ -274,6 +274,7 @@ void free(void* addr){
                 insert_pool(tmp2);
                 return;
             }
+            tmp = tmp->next;
         }
     }
 }

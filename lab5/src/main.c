@@ -7,6 +7,8 @@
 #include "interrupt_queue.h"
 #include "aux.h"
 #include "jump.h"
+#include "thread.h"
+
 #define max_length 128
 
 struct JumpBuf jb;
@@ -35,8 +37,8 @@ int main() {
     //core_timer_enable();
     //timer_init();   //local timer
     setjump(&jb);
+    schedule();
     while (1){
-        uart_read_line();
-        //exe_first_task();
+        longjump(&jb,0);
     }
 }

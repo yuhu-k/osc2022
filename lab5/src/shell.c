@@ -53,6 +53,8 @@ void shell_init(){
     memory_reserve(*addr,*addr + 0x100000); //Device tree
 
     memory_reserve(0x0,0x80000);  //Kernel stack
+
+    init_thread();
 }
 
 void reset_flag(){
@@ -64,40 +66,37 @@ void reset_flag(){
 
 void uart_read_line(){
     char in;
-    while(1){
+    if(cmd_flag == 0){
+        uart_printf("# ");
+        cmd_flag = 1;
+        cmd_index = 0;
+        for(int i=0;i<1024;i++) cmd_buffer[i]=0;
+    }
+    while( uart_pop(&in) ){
         if(cmd_flag == 0){
             uart_printf("# ");
             cmd_flag = 1;
             cmd_index = 0;
             for(int i=0;i<1024;i++) cmd_buffer[i]=0;
         }
-        while( uart_pop(&in) ){
-            if(cmd_flag == 0){
-                uart_printf("# ");
-                cmd_flag = 1;
-                cmd_index = 0;
-                for(int i=0;i<1024;i++) cmd_buffer[i]=0;
+        if(in == 13){
+            uart_printf("\n");
+            cmd_buffer[cmd_index++] = '\0';
+            cmd_flag = 0;
+            check(cmd_buffer);
+        }else if((in==8 || in==127)){
+            if(cmd_index>0){
+                cmd_index--;
+                char t[1]={8};
+                cmd_buffer[cmd_index]='\0';
+                uart_write(8);
+                uart_write(' ');
+                uart_write(8);
             }
-            if(in == 13){
-                uart_printf("\n");
-                cmd_buffer[cmd_index++] = '\0';
-                cmd_flag = 0;
-                check(cmd_buffer);
-            }else if((in==8 || in==127)){
-                if(cmd_index>0){
-                    cmd_index--;
-                    char t[1]={8};
-                    cmd_buffer[cmd_index]='\0';
-                    uart_write(8);
-                    uart_write(' ');
-                    uart_write(8);
-                }
-            }else if( in>=32 && in<=126 ){
-                cmd_buffer[cmd_index++]=in;
-                //uart_write(in);
-                uart_push(in);
-                *AUX_MU_IER |= 2;
-            }
+        }else if( in>=32 && in<=126 ){
+            cmd_buffer[cmd_index++]=in;
+            uart_push(in);
+            *AUX_MU_IER |= 2;
         }
     }
 }
@@ -128,7 +127,7 @@ struct ARGS* parse_command(char *command){
 
 void temp_func(){
     uart_printf("10\n");
-    schedule();
+    delay(5);
     uart_printf("20\n");
 }
 
@@ -179,93 +178,19 @@ void check(char *input){
             execute("program2.img\0",cpio_start);
         if(input[2] == '3')
             execute("program3.img\0",cpio_start);
-    }else if(strncmp(input,"timer", 5)){
-        if(input[5]!=' '){
-            int clock_hz,now_time,interval;
-            asm volatile("mrs %[input0], cntfrq_el0\n"
-                         "mrs %[input1], cntp_tval_el0\n"
-                         :[input0] "=r" (clock_hz),
-                         [input1] "=r" (interval));
-            uart_printf("%d\n", interval/clock_hz);
-        }else{
-            char name[128];
-            for(int i=0;i<128;i++) name[i] = 0;
-            int i;
-            for(i=6;input[i]>=46 && input[i]<=122  && i<128 && input[i]!='\0'; i++){
-                name[i-6]=input[i];
-            }
-            if(strncmp(name,"stop",4)){
-                core_timer_disable();
-            }
-            else if(strncmp(name,"start",5)){
-                core_timer_enable();
-            }
-        }
+    }else if(strcmp(input,"timer")){
+        int clock_hz,now_time,interval;
+        asm volatile("mrs %[input0], cntfrq_el0\n"
+                     "mrs %[input1], cntp_tval_el0\n"
+                     :[input0] "=r" (clock_hz),
+                     [input1] "=r" (interval));
+        uart_printf("%d\n", interval/clock_hz);
+        
     }else if(strncmp(input,"sleep", 5)){
         char time[5];
         for(int i=0;i<5 && input[i+6]>=32 && input[i+6]<=127;i++) time[i] = input[i+6];
-        sleep(atoi(time));
-    }else if(strcmp(input,"mem")){
-        if(input[4] != '-')
-            show_status();
-        else if(input[5] == 'a'){
-            char size[128];
-            for(int i=0;input[i+7]<='9' && input[i+7]>='0' && i<121;i++){
-                size[i] = input[i+7];
-                size[i+1]='\0';
-            }
-            int SIZE = atoi(size);
-            for(int i=9;i>0;i--){
-                m[i] = m[i-1];
-            }
-            m[0] = malloc(SIZE);
-            uart_printf("Allocate address: 0x%x\n",m[0]);
-        }else if(input[5] == 'd'){
-            free(m[0]);
-            uart_printf("Address 0x%x had been free.\n",m[0]);
-            for(int i=0;i<9;i++){
-                m[i] = m[i+1];
-            }
-            m[9] = NULL;
-        }else if(input[5] == 's'){
-            pool_status();
-        }else if(input[5] == 'c'){
-            clear_pool();
-        }
-        else if(input[5] == 'r'){
-            char start[128];
-            int padding=7, ishex=0;
-            int s,e;
-            if(input[7] == '0' && input[8] == 'x'){
-                padding+=2;
-                ishex = 1;
-            }
-            int i;
-            for(i=0;input[i+padding]<=127 && input[i+padding]>=48 && i<121;i++){
-                start[i] = input[i+padding];
-                start[i+1]='\0';
-            }
-            if(ishex)
-                s=a16toi(start);
-            else
-                s=atoi(start);
-            padding += i+1;
-            ishex = 0;
-            if(input[padding] == '0' && input[padding+1] == 'x'){
-                padding+=2;
-                ishex = 1;
-            }
-            for(i=0;input[i+padding]<=127 && input[i+padding]>=48 && i<121;i++){
-                start[i] = input[i+padding];
-                start[i+1]='\0';
-            }
-            if(ishex)
-                e=a16toi(start);
-            else
-                e=atoi(start);
-            memory_reserve(s,e);
-            uart_printf("Address 0x%x to 0x%x is reserved.\n",s,e);
-        }
+        int times = atoi(time);
+        sleep(times);
     }else if(strcmp(cmd->argv[0],"thread")){
         int t=1;
         optind = 1;
@@ -276,7 +201,6 @@ void check(char *input){
                     Thread(temp_func);
                     break;
                 case 'r':
-                    schedule();
                     break;
                 case 0:
                     t=0;
