@@ -18,6 +18,7 @@ switch_to:
     ldr x9, [x1, 16 * 6]
     mov sp,  x9
     msr tpidr_el1, x1
+    mov x0, #0
     ret
 
 .global get_current
@@ -36,21 +37,35 @@ store_and_jump:
     mov x9, sp
     str x9, [x0, 16 * 6]
 
-    sub sp, sp, 8
-    str lr, [sp, 8 * 0]
+    mov x29, sp
+
+    ldr x9, [x1, 8 * 1]
+    mov sp, x9
+
+    stp   x1, x29, [sp, #-16]!
+    mov   fp, sp
 
     ldr x9, [x1, 8 * 0]
-
     msr tpidr_el1, x1
     blr x9
-    msr tpidr_el1, x0
 
-    ldr lr, [sp, 8 * 0]
-    add sp, sp, 8
+    ldp  x0, x29, [sp, 16 * 0]
+    mov  sp, x29
 
-    ret
+    mov  w1, 3
+    str  w1, [x0, 140]
+
+    bl   p
+
+    bl  schedule
 
 .global set_current
 set_current:
+    ldr x9, [x0, 8 * 1]
+    mov sp, x9
+
+    mov fp, sp
+
     msr tpidr_el1, x0
-    ret
+    ldr x9, [x0, 8 * 0]
+    blr  x9

@@ -3,6 +3,7 @@
 #include "peripheral/irq.h"
 #include "timer.h"
 #include "interrupt_queue.h"
+#include "reboot.h"
 
 #define uart_puts uart_printf
 /**
@@ -92,5 +93,5 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
     uart_printf("0x%x ",spsr>>32);
     uart_printf("0x%x",spsr);
     uart_puts("\n");
-    if (type%4 == 0) main();
+    if (type%4 == 0) reset(50);
 }

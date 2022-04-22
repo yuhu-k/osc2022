@@ -1,5 +1,7 @@
 tool_chain = aarch64-linux-gnu-
 SIMU_ENV = qemu-system-aarch64
+CC = gcc-10
+CPP = g++-11
 
 SRC_DIR = src
 DUM_DIR = out
@@ -18,16 +20,16 @@ kernel8.img: $(DUM_DIR) $(OBJS) $(OBJSS) $(SRC_DIR)/linker.ld
 	$(tool_chain)objcopy -O binary kernel8.elf kernel8.img
 
 $(DUM_DIR)/%.o: $(SRC_DIR)/%.S
-	$(tool_chain)gcc-10 -g -Wall -I include -c $< -o $@
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@
 
 $(DUM_DIR)/%.o: $(SRC_DIR)/%.c
-	$(tool_chain)gcc-10 -g -Wall -I include -c $< -o $@ -fno-stack-protector
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector
 
 $(DUM_DIR): 
 	mkdir -p $(DUM_DIR)
 
 sender: sendfile.cpp
-	g++-11 sendfile.cpp -o sender
+	$(CPP) sendfile.cpp -o sender
 
 clean:
 	rm -rf kernel8.*

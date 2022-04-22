@@ -24,6 +24,8 @@ unsigned int cmd_flag  = 0;
 
 
 void shell_init(){
+    asm("mov x0, #0\n"
+        "msr tpidr_el1, x0\n");
     uint32 *heap = (uint32*)(&__heap_start-8);
     *heap &= 0x00000000;
     uart_init();
@@ -55,6 +57,7 @@ void shell_init(){
     memory_reserve(0x0,0x80000);  //Kernel stack
 
     init_thread();
+
 }
 
 void reset_flag(){
@@ -126,8 +129,16 @@ struct ARGS* parse_command(char *command){
 }
 
 void temp_func(){
+    uint64 a;
     uart_printf("10\n");
-    delay(5);
+    delay(5000);
+    uart_printf("20\n");
+}
+
+void temp_func2(){
+    uint64 a;
+    uart_printf("10\n");
+    delay(10000);
     uart_printf("20\n");
 }
 
@@ -199,12 +210,35 @@ void check(char *input){
             switch (c){
                 case 'a':
                     Thread(temp_func);
+                    Thread(temp_func2);
+                    Thread(temp_func);
                     break;
                 case 'r':
                     break;
                 case 0:
                     t=0;
                     break;
+            }
+        }
+    }else if(strcmp(cmd->argv[0],"mem")){
+        int t=1;
+        optind = 1;
+        while(t){
+            char c = getopt(cmd->argc,cmd->argv,":s:a");
+            switch (c){
+                case 's':
+                    pool_status();
+                    break;
+                case 'a':
+                    printf_thread();
+                    break;
+                case 0:
+                    t=0;
+                    break;
+                default:
+                    show_status();
+                    break;
+
             }
         }
     }else{

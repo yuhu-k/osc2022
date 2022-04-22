@@ -38,9 +38,8 @@ SECTIONS
 
     . = . + __heap_size;
     
-    . = ALIGN(4096);
   }
-
+  . = ALIGN(0x20000);
   _end_ = .;
 
 }

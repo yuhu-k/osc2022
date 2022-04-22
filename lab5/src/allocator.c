@@ -16,7 +16,6 @@ struct FrameArray** frame_list;
 struct FrameArray* frame_array;
 
 struct mem_frag *pool;
-struct mem_frag *in_used_pool;
 
 struct mem_reserved_pool *MR_pool;
 
@@ -24,6 +23,11 @@ struct mem_reserved_pool *MR_pool;
 void* simple_malloc(unsigned int size) {
     uint32 *temp=(uint32*)(&__heap_start-8);
     uint32 addr = ((uint32) &__heap_start) + *temp;
+    if(size%16 != 0){
+        size /= 16;
+        size *= 16;
+        size += 16;
+    }
     *temp+=size;
     return (void*) addr;
 }
@@ -180,73 +184,54 @@ void insert_pool(struct mem_frag* f){
     tmp->next = f;
 }
 
+
 void* malloc(size_t size){
     struct mem_frag* tmp = pool;
     if(size != exp2(log2(size))) size = exp2(log2(size) + 1);
-    if(tmp == NULL){
-        int req_page_num;
-        req_page_num = size%page_size != 0? size/page_size+1 : size/page_size;
-        req_page_num = exp2(log2(req_page_num)) != req_page_num? exp2(log2(req_page_num) + 1) : req_page_num;
-        tmp = simple_malloc(sizeof(struct mem_frag));
-        tmp->start = page_alloc(req_page_num);
-        tmp->size = req_page_num * page_size;
-        tmp->next = NULL;
-    }else if(tmp->size >= size){
-        pool = pool->next;
-        tmp->next = NULL;
-    }else{
-        int suc = 0;
-        while(tmp->next != NULL){
-            if(tmp->next->size >= size){
-                suc = 1;
-                struct mem_frag* tmp2;
-                tmp2 = tmp;
-                tmp = tmp->next;
-                tmp2->next = tmp->next;
-                tmp->next = NULL;
-                break;
+    
+    while(tmp != NULL){
+        if(tmp->size == size && tmp->leave > 0){
+            for(int i=0;i<tmp->num;i++){
+                if(tmp->status[i] == 1){
+                    tmp->status[i] = 0;
+                    void* addr = tmp->start + tmp->size*i;
+                    tmp->leave--;
+                    record_mem(addr);
+                    return addr;
+                }
             }
-            tmp = tmp->next;
+            
         }
-        if(suc == 0){
-            int req_page_num;
-            req_page_num = size%page_size != 0? size/page_size+1 : size/page_size;
-            req_page_num = exp2(log2(req_page_num)) != req_page_num? exp2(log2(req_page_num) + 1) : req_page_num;
-            tmp = simple_malloc(sizeof(struct mem_frag));
-            tmp->start = page_alloc(req_page_num);
-            tmp->size = req_page_num * page_size;
-            tmp->next = NULL;
-        }
+        tmp = tmp->next;
     }
-    if(tmp->size/size >= 2){
-        void* addr = tmp->start;
-        tmp->start += size;
-        tmp->size -= size;
-        insert_pool(tmp);
-        struct mem_frag * tmp2 = simple_malloc(sizeof(struct mem_frag));
-        tmp2->next = in_used_pool;
-        tmp2->size = size;
-        tmp2->start = addr;
-        in_used_pool = tmp2;
-        return tmp2->start;
-    }else{
-        tmp->next = in_used_pool;
-        in_used_pool = tmp;
-        return tmp->start;
+    int req_page_num;
+    req_page_num = size%page_size != 0? size/page_size+1 : size/page_size;
+    req_page_num = exp2(log2(req_page_num)) != req_page_num? exp2(log2(req_page_num) + 1) : req_page_num;
+
+    tmp = simple_malloc(sizeof(struct mem_frag));
+    tmp->size = size;
+    tmp->start = page_alloc(req_page_num);
+    tmp->end = tmp->start + size;
+    tmp->num = req_page_num * 4096 / size;
+    tmp->status = simple_malloc(tmp->num);
+    tmp->leave = tmp->num - 1;
+    tmp->next = NULL;
+
+    insert_pool(tmp);
+    for(int i=0;i<tmp->num;i++){
+        tmp->status[i] = 1;
     }
+    tmp->status[0] = 0;
+    void* addr = tmp->start;
+    record_mem(addr);
+    return addr;
 }
 
 void pool_status(){
     struct mem_frag* f = pool;
     uart_printf("Available pool:\n");
     for(int i=1;f!=NULL;i++){
-        uart_printf("  %d: addr: 0x%x size: %d\n",i,f->start,f->size);
-        f = f->next;
-    }
-    f = in_used_pool;
-    uart_printf("In used pool:\n");
-    for(int i=1;f!=NULL;i++){
-        uart_printf("  %d: addr: 0x%x size: %d\n",i,f->start,f->size);
+        uart_printf("  %d: addr: 0x%x size: %d num: %d leave: %d\n",i,f->start,f->size,f->num,f->leave);
         f = f->next;
     }
     struct mem_reserved_pool* f1 = MR_pool;
@@ -258,24 +243,16 @@ void pool_status(){
 }
 
 void free(void* addr){
-    struct mem_frag* tmp = in_used_pool;
-    if(tmp == NULL) return;
-    else if(tmp->start == addr){
-        in_used_pool = in_used_pool->next;
-        tmp->next = NULL;
-        insert_pool(tmp);
-        return;
-    }else{
-        while(tmp->next != NULL){
-            if(tmp->next->start == addr){
-                struct mem_frag* tmp2 = tmp->next;
-                tmp->next = tmp->next->next;
-                tmp2->next = NULL;
-                insert_pool(tmp2);
-                return;
-            }
-            tmp = tmp->next;
+    struct mem_frag* tmp = pool;
+    while(tmp != NULL){
+        if(tmp->end > addr && tmp->start <= addr){
+            if(tmp->status[(addr-tmp->start)/tmp->size] == 0){
+                tmp->leave++;
+                tmp->status[(addr-tmp->start)/tmp->size] = 1;
+            }   
+            return;
         }
+        tmp = tmp->next;
     }
 }
 
@@ -283,10 +260,6 @@ void clear_pool(){
     while(pool!=NULL){
         page_free(pool->start);
         pool = pool->next;
-    }
-    while(in_used_pool!=NULL){
-        page_free(in_used_pool->start);
-        in_used_pool = in_used_pool->next;
     }
 }
 

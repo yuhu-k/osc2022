@@ -2,6 +2,7 @@
     "files.associations": {
         "getopt.h": "c",
         "uint.h": "c",
-        "queue.h": "c"
+        "queue.h": "c",
+        "priority_queue.h": "c"
     }
 }

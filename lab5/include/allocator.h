@@ -16,10 +16,12 @@ struct FrameArray{
 };
 
 struct mem_frag{
-    void* start;
+    void* start,*end;
     struct mem_frag *next;
-    int size;
+    uint32 size, num, leave;
+    byte *status;
 };
+
 
 struct mem_reserved_pool{
     void* start, *end;

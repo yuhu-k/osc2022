@@ -1,18 +1,19 @@
 #include "allocator.h"
 #include "priority_queue.h"
 #include "uint.h"
+#include "thread.h"
 
 struct node *nodes = NULL;
 int num_of_nodes=0;
 
-int add_node(void (*callback_f)(),void* arguments,int times,int time_gap){
+uint64 add_node(void (*callback_f)(),void* arguments,uint64 times,uint64 time_gap){
     
-    struct node *node = simple_malloc(sizeof(struct node));
+    struct node *node = malloc(sizeof(struct node));
     node->time_to_ring = times;
     node->todo = callback_f;
     node->next = NULL;
     node->arguments = arguments;
-
+    int a;
     if(nodes == NULL){
         nodes = node;
     }else if( time_gap >= times){
@@ -26,25 +27,25 @@ int add_node(void (*callback_f)(),void* arguments,int times,int time_gap){
             temp = temp->next;
         }
     }else{
-        struct node* temp1 = nodes;
-        temp1->time_to_ring -= time_gap;
-        struct node* temp2 = nodes->next;
-        while(temp2 != NULL){
-            temp2->time_to_ring -= time_gap;
-            if(temp2->time_to_ring >= times){
-                temp1->next = node;
-                node->next = temp2;
+        struct node* temp = nodes;
+        time_gap = nodes->time_to_ring-time_gap;
+        temp->time_to_ring -= time_gap;
+        while(temp->next != NULL){
+            temp->next->time_to_ring -= time_gap;
+            if(temp->next->time_to_ring >= times){
+                node->next = temp->next;
+                temp->next = node;
+                break;
             }else{
-                temp1 = temp2;
-                temp2 = temp2->next;
+                temp = temp->next;
             }
         }
-        if(temp2 == NULL){
-            temp1->next = node;
+        if(temp->next == NULL){
+            temp->next = node;
         }else{
-            while(temp2 != NULL){
-                temp2->time_to_ring -= time_gap;
-                temp2 = temp2->next;
+            while(temp->next != NULL){
+                temp->next->time_to_ring -= time_gap;
+                temp = temp->next;
             }
         }
     }

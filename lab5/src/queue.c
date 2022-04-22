@@ -4,30 +4,25 @@
 struct thread* run_queue = NULL, *wait_queue = NULL;
 
 int schedule(){
-    while(1){
-        if(run_queue == NULL){
-            set_first_thread();
-        }
-        struct thread* tmp = run_queue;
-        run_queue = run_queue->next;
-        if(tmp->status == running){
-            struct thread* prev = get_current();
-            switch_to(prev,tmp);
-            return;
+    if(run_queue == NULL){
+        push_first_thread();
+    }
+    struct thread* prev = get_current();
+    struct thread* tmp = run_queue;
+    run_queue = run_queue->next;
+    void* sp_addr,*pc_addr;
+    /*asm volatile ("mov %[input0], sp\n"
+                 : [input0] "=r" (sp_addr));
+    uart_printf("tid: %d\nsp addr: 0x%x\n",prev->tid,sp_addr);*/
+    if(tmp->status == running){
+        switch_to(prev,tmp);
+    }else{
+        tmp->status = running;
+        if(tmp->tid == 0){
+            set_current(tmp);
         }else{
-            if(tmp->tid == 0){
-                tmp->status = running;
-                set_current(tmp);
-                tmp->func();
-            }else{
-                struct thread* prev = get_current();
-                tmp->status = running;
-                store_and_jump(prev,tmp);
-                //uart_printf("0x%x 0x%x\n",a,tmp->registers[0]);
-                tmp->func();
-                //rev_stack();
-                tmp->status = dead;
-            }
+            store_and_jump(prev,tmp);
+            return;
         }
     }
 }
@@ -45,29 +40,19 @@ void push2run_queue(struct thread* thread){
     }
 }
 
-void* push2waiting_queue(){
-    struct thread *thread = get_current();
-    if(wait_queue != NULL){
-        struct thread *tmp = wait_queue;
-        while(tmp->next != NULL) tmp = tmp->next;
-        tmp->next = thread;
-    }else{
-        wait_queue = thread;
-    }
-}
-
 void wakeup_queue(struct thread *t){
-    uart_printf("789");
     /*struct thread *tmp = wait_queue;
     if(tmp != NULL){
         if(tmp->tid == t->tid){
             wait_queue = wait_queue->next;
+            t->status = running;
             push2run_queue(t);
             return;
         }else{
             while(tmp->next != NULL){
                 if(tmp->next->tid == t->tid){
                     tmp->next = tmp->next->next;
+                    t->status = running;
                     push2run_queue(t);
                     return;
                 }else{
@@ -76,4 +61,11 @@ void wakeup_queue(struct thread *t){
             }
         }
     }*/
+    t->status = running;
+    push2run_queue(t);
 }
+
+void p(struct thread *t)
+{
+    t->status = dead;
+};

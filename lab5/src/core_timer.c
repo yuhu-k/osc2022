@@ -27,12 +27,12 @@ void core_timer_handler(){
 }
 
 void add_timer(void (*callback_f)(void*),void *argu_for_call,int times){
-    int clock_hz,now_time,interval;
+    uint64 clock_hz,now_time,interval;
     asm volatile("mrs %[input0], cntfrq_el0\n"
                  "mrs %[input2], cntp_tval_el0\n"
                  :[input0] "=r" (clock_hz),
                   [input2] "=r" (interval));
-    int time_to_ring = add_node(callback_f, argu_for_call, clock_hz * times, interval);
+    uint64 time_to_ring = add_node(callback_f, argu_for_call, clock_hz / 1000 * times, interval);
     core_timer_enable();
     asm volatile("msr cntp_tval_el0, %[output0]\n"
                  ::[output0] "r" (time_to_ring));
@@ -48,7 +48,7 @@ void sleep(int duration){
 }
 
 void delay(int duration){
-    void *argu = push2waiting_queue();
+    void *argu = get_current();
     add_timer(wakeup_queue,argu,duration);
     schedule();
 }

@@ -37,6 +37,8 @@ int main() {
     //core_timer_enable();
     //timer_init();   //local timer
     setjump(&jb);
+    clear_threads();
+    set_first_thread();
     schedule();
     while (1){
         longjump(&jb,0);
