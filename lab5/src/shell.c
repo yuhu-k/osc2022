@@ -211,7 +211,7 @@ void check(char *input){
                 case 'a':
                     Thread(temp_func);
                     Thread(temp_func2);
-                    Thread(temp_func);
+                    //Thread(temp_func);
                     break;
                 case 'r':
                     break;
@@ -224,13 +224,16 @@ void check(char *input){
         int t=1;
         optind = 1;
         while(t){
-            char c = getopt(cmd->argc,cmd->argv,":s:a");
+            char c = getopt(cmd->argc,cmd->argv,":s:a:p");
             switch (c){
                 case 's':
                     pool_status();
                     break;
                 case 'a':
                     printf_thread();
+                    break;
+                case 'p':
+                    print_node();
                     break;
                 case 0:
                     t=0;

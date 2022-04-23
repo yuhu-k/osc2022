@@ -18,10 +18,9 @@ uint64 add_node(void (*callback_f)(),void* arguments,uint64 times,uint64 time_ga
         nodes = node;
     }else if( time_gap >= times){
         time_gap = nodes->time_to_ring-time_gap;
-        nodes->time_to_ring -= time_gap;
         node->next = nodes;
         nodes = node;
-        struct node *temp=nodes->next->next;
+        struct node *temp=nodes->next;
         while(temp != NULL){
             temp->time_to_ring -= time_gap;
             temp = temp->next;
@@ -35,6 +34,7 @@ uint64 add_node(void (*callback_f)(),void* arguments,uint64 times,uint64 time_ga
             if(temp->next->time_to_ring >= times){
                 node->next = temp->next;
                 temp->next = node;
+                temp->next = temp->next->next;
                 break;
             }else{
                 temp = temp->next;
@@ -54,7 +54,7 @@ uint64 add_node(void (*callback_f)(),void* arguments,uint64 times,uint64 time_ga
 }
 
 struct node* delete_first_node(){
-    int times=nodes->time_to_ring;
+    uint64 times=nodes->time_to_ring;
     struct node *t = nodes;
     nodes = nodes->next;
     struct node *temp = nodes;
@@ -64,4 +64,14 @@ struct node* delete_first_node(){
     }
     num_of_nodes--;
     return t;
+}
+
+void print_node(){
+    struct node *temp = nodes;
+    int i=0;
+    while(temp != NULL){
+        uart_printf("%d: %d\n",i,temp->time_to_ring);
+        i++;
+        temp = temp->next;
+    }
 }

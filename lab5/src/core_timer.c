@@ -4,8 +4,6 @@
 #include "queue.h"
 #include "scheduler.h"
 
-int bp;
-
 
 void arm_core_timer_intr_handler() {
     core_timer_handler();
@@ -20,9 +18,13 @@ void core_timer_handler(){
                      "msr cntp_tval_el0, x0\n");
         core_timer_disable();
     }else{
+        core_timer_enable();
+        uint64 interval = node->next->time_to_ring;
         asm volatile("msr cntp_tval_el0, %[output0]\n"
-                     ::[output0] "r" (node->next->time_to_ring));
+                     ::[output0] "r" (interval));
     }
+    
+    free(node);
     node->todo(node->arguments);
 }
 

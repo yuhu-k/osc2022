@@ -124,7 +124,6 @@ void handle_child(tid_t tid){
 void free_mem_table(struct thread *t){
     for(int i=0;i<256;i++){
         if(t->malloc_table[i] != NULL){
-            //uart_printf("memory: 0x%x\n",t->malloc_table[i]);
             free(t->malloc_table[i]);
             t->malloc_table[i] = NULL;
         }else{

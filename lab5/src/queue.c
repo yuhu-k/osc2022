@@ -11,9 +11,6 @@ int schedule(){
     struct thread* tmp = run_queue;
     run_queue = run_queue->next;
     void* sp_addr,*pc_addr;
-    /*asm volatile ("mov %[input0], sp\n"
-                 : [input0] "=r" (sp_addr));
-    uart_printf("tid: %d\nsp addr: 0x%x\n",prev->tid,sp_addr);*/
     if(tmp->status == running){
         switch_to(prev,tmp);
     }else{
@@ -36,6 +33,7 @@ void push2run_queue(struct thread* thread){
         tmp->next = thread;
         thread->next = NULL;
     }else{
+        thread->next = NULL;
         run_queue = thread;
     }
 }
