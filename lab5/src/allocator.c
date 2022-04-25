@@ -188,7 +188,6 @@ void insert_pool(struct mem_frag* f){
 void* malloc(size_t size){
     struct mem_frag* tmp = pool;
     if(size != exp2(log2(size))) size = exp2(log2(size) + 1);
-    
     while(tmp != NULL){
         if(tmp->size == size && tmp->leave > 0){
             for(int i=0;i<tmp->num;i++){
@@ -211,12 +210,11 @@ void* malloc(size_t size){
     tmp = simple_malloc(sizeof(struct mem_frag));
     tmp->size = size;
     tmp->start = page_alloc(req_page_num);
-    tmp->end = tmp->start + size;
     tmp->num = req_page_num * 4096 / size;
+    tmp->end = tmp->start + req_page_num * 4096;
     tmp->status = simple_malloc(tmp->num);
     tmp->leave = tmp->num - 1;
     tmp->next = NULL;
-
     insert_pool(tmp);
     for(int i=0;i<tmp->num;i++){
         tmp->status[i] = 1;
@@ -245,7 +243,7 @@ void pool_status(){
 void free(void* addr){
     struct mem_frag* tmp = pool;
     while(tmp != NULL){
-        if(tmp->end > addr && tmp->start <= addr){
+        if((uint64)addr < (uint64)tmp->end && (uint64)tmp->start <= (uint64)addr){
             if(tmp->status[(addr-tmp->start)/tmp->size] == 0){
                 tmp->leave++;
                 tmp->status[(addr-tmp->start)/tmp->size] = 1;

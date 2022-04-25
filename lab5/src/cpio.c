@@ -1,6 +1,10 @@
 #include "uint.h"
 #include "mini_uart.h"
 #include "string.h"
+#include "excep.h"
+#include "thread.h"
+
+extern unsigned int cpio_start;
 
 typedef struct cpio_newc_header {  //cpio new ascii struct
 		   char	   c_magic[6];
@@ -98,8 +102,8 @@ void print_content(char *file, uint32 addr){
     }
 }
 
-void execute(char *file, uint32 addr){
-    uint32 f_addr=find_file_addr(file,addr);
+void execute(char *file,char *const argv[]){
+    uint32 f_addr=find_file_addr(file,cpio_start);
     if(f_addr != NULL){
         int length;
         uint32 address = getContent(f_addr, &length);
@@ -109,8 +113,14 @@ void execute(char *file, uint32 addr){
             address *= 4;
             address += 4;
         }
-        char* save_lr=simple_malloc(8);
-        from_el1_to_el0(address);
+        void * start = malloc(length + 0x20000);
+        byte *ucode = (uint64)start + 0x10000;
+        byte *file = address;
+        for(int i=0;i<length;i++){
+            ucode[i] = file[i];
+        }
+        int tid = Thread(from_el1_to_el0,ucode);
+        move_last_mem(0);
         return;
     }else{
         uart_printf("Not found file \"%s\"\n",file);

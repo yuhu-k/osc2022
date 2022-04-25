@@ -1,6 +1,6 @@
 #include "uint.h"
 #pragma once
-void Thread(void *func(void));
+int Thread(void *func(void), ...);
 void idle();
 void init_thread();
 void set_first_thread();
@@ -9,6 +9,10 @@ void handle_child(tid_t tid);
 void push_first_thread();
 void printf_thread();
 void record_mem(void* addr);
+int getpid();
+int set_fork(void *t,void* sp);
+void kill(pid_t pid);
+void move_last_mem(tid_t tid);
 
 #define thread_numbers 65536
 

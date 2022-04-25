@@ -4,17 +4,90 @@
 #include "timer.h"
 #include "interrupt_queue.h"
 #include "reboot.h"
-
+#include "thread.h"
+#include "cpio.h"
+#include "mailbox.h"
+#include "queue.h"
 #define uart_puts uart_printf
 /**
  * common exception handler
  */
 
-void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, unsigned long spsr)
+
+
+
+struct trapframe {
+    uint64 x[31]; // general register from x0 ~ x30
+    uint64 spsr_el1;
+    uint64 elr_el1;
+};
+
+void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, unsigned long spsr, void* sp_addr)
 {
     // print out interruption type
     switch(type%4) {
-        case 0: uart_puts("Synchronous"); break;
+        case 0: 
+        {
+            if(esr>>26 == 0b010101){
+                asm volatile("msr DAIFClr, 0xf\n");
+                struct trapframe *tf = sp_addr;
+                switch(tf->x[8]){
+                    case 0:
+                        tf->x[0] = getpid();
+                        return;
+                        break;
+                    case 1:{
+                        char *buf = tf->x[0], temp[256];
+                        int rn = 0;
+                        while(1){
+                            temp[0] = 0;
+                            uart_pop(temp);
+                            for(int i=0;i<256;i++){
+                                if(temp[i] == 0) break;
+                                buf[rn++] = temp[i];
+                                if(rn >= tf->x[1]){
+                                    tf->x[0] = tf->x[1];
+                                    return;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    case 2:{
+                        char *buf = tf->x[0];
+                        for(int i=0;i<tf->x[1];i++){
+                            uart_write(buf[i]);
+                        }
+                        tf->x[0] = tf->x[1];
+                        return;
+                        break;
+                    }
+                    case 3:
+                        execute(tf->x[0],tf->x[1]);
+                        return;
+                        break;
+                    case 4:
+                        tf->x[0] = set_fork(tf,sp_addr);
+                        return;
+                        break;
+                    case 5:
+                        exit();
+                        break;
+                    case 6:
+                        tf->x[0] = mailbox_call(tf->x[1],tf->x[0]);
+                        return;
+                        break;
+                    case 7:
+                        kill(tf->x[0]);
+                        return;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            uart_puts("Synchronous"); 
+            break;
+        }
         case 1: 
             if(handle_irq()){
                 asm volatile("msr DAIFClr, 0xf\n");

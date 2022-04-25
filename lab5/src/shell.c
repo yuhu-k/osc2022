@@ -8,6 +8,7 @@
 #include "thread.h"
 #include "getopt.h"
 #include "scheduler.h"
+#include "loadimg.h"
 
 struct ARGS{
     char** argv;
@@ -24,15 +25,13 @@ unsigned int cmd_flag  = 0;
 
 
 void shell_init(){
-    asm("mov x0, #0\n"
-        "msr tpidr_el1, x0\n");
     uint32 *heap = (uint32*)(&__heap_start-8);
     *heap &= 0x00000000;
     uart_init();
     uart_printf("\n\n\nHello From RPI3\n");
     uart_init_buffer();
     uart_flush();
-    core_timer_disable();
+    core_timer_init();
     init_allocator();
     uint32 *ramf_start,*ramf_end;
     ramf_start=find_property_value("/chosen\0","linux,initrd-start\0");  //get ramf start addr from dtb
@@ -128,18 +127,45 @@ struct ARGS* parse_command(char *command){
     return args;
 }
 
-void temp_func(){
-    uint64 a;
-    uart_printf("10\n");
-    delay(5000);
-    uart_printf("20\n");
+void temp_func2(){
+    uart_printf("2");
 }
 
-void temp_func2(){
-    uint64 a;
-    uart_printf("10\n");
-    delay(10000);
-    uart_printf("20\n");
+void temp_func3(){
+    uart_printf("3");
+}
+void temp_func(){
+}
+
+
+
+void fork_test(){
+    uart_printf("\nFork Test, pid %d\n", getpid1());
+    int cnt = 1;
+    int ret = 0;
+    if ((ret = fork1()) == 0) { // child
+        long long cur_sp;
+        asm volatile("mov %0, sp" : "=r"(cur_sp));
+        uart_printf("first child pid: %d, cnt: %d, ptr: %x, sp : %x\n", getpid1(), cnt, &cnt, cur_sp);
+        ++cnt;
+
+        if ((ret = fork1()) != 0){
+            asm volatile("mov %0, sp" : "=r"(cur_sp));
+            uart_printf("first child pid: %d, cnt: %d, ptr: %x, sp : %x\n", getpid1(), cnt, &cnt, cur_sp);
+        }
+        else{
+            while (cnt < 5) {
+                asm volatile("mov %0, sp" : "=r"(cur_sp));
+                uart_printf("second child pid: %d, cnt: %d, ptr: %x, sp : %x\n", getpid1(), cnt, &cnt, cur_sp);
+                delay(5000);
+                ++cnt;
+            }
+        }
+        exit1();
+    }
+    else {
+        uart_printf("parent here, pid %d, child %d\n", getpid1(), ret);
+    }
 }
 
 void check(char *input){
@@ -176,19 +202,14 @@ void check(char *input){
         name[i]='\0';
         print_content(name, cpio_start);
     }else if(strncmp(input,"./",2)){
-        /*char name[128];
+        char name[128];
         for(int i=0;i<128;i++) name[i] = 0;
         int i;
         for(i=2;input[i]>=46 && input[i]<=122  && i<128 && input[i]!='\0'; i++){
             name[i-2]=input[i];
         }
-        execute(name,cpio_start);*/
-        if(input[2] == '1')
-            execute("program1.img\0",cpio_start);
-        if(input[2] == '2')
-            execute("program2.img\0",cpio_start);
-        if(input[2] == '3')
-            execute("program3.img\0",cpio_start);
+        char *const argv[] = {name};
+        execute(name,argv);
     }else if(strcmp(input,"timer")){
         int clock_hz,now_time,interval;
         asm volatile("mrs %[input0], cntfrq_el0\n"
@@ -209,9 +230,8 @@ void check(char *input){
             char c = getopt(cmd->argc,cmd->argv,":a:r");
             switch (c){
                 case 'a':
-                    Thread(temp_func);
-                    Thread(temp_func2);
-                    //Thread(temp_func);
+                    for(int i=0;i<10;i++)
+                        Thread(temp_func);
                     break;
                 case 'r':
                     break;
@@ -244,6 +264,10 @@ void check(char *input){
 
             }
         }
+    }else if(strcmp(cmd->argv[0],"lp")){
+        loadimg();
+    }else if(strcmp(cmd->argv[0],"test")){
+        Thread(fork_test);
     }else{
         uart_printf("command not found: %s\n",input);
     }

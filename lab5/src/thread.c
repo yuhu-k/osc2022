@@ -4,10 +4,14 @@
 #include "queue.h"
 #include "scheduler.h"
 #include "shell.h"
+#include "excep.h"
 
 struct thread *threads[thread_numbers];
 
-void Thread(void *func(void)){
+int Thread(void *func(void),...){
+    __builtin_va_list args;
+    __builtin_va_start(args, func);
+    void* arg =  __builtin_va_arg(args, void*);
     struct thread *t;
     t = malloc(sizeof(struct thread));
     delete_last_mem();
@@ -16,6 +20,7 @@ void Thread(void *func(void)){
     t->childs = NULL;
     t->registers[0] = func;
     t->registers[1] = ( (uint64)(t->stack + 0x10000) & 0xfffffff0);
+    t->registers[2] = arg;
     struct thread *temp = get_current();
     t->ptid = temp->tid;
     t->malloc_table[0] = NULL;
@@ -41,7 +46,7 @@ void Thread(void *func(void)){
         }
     }
     push2run_queue(t);
-    return ;
+    return t->tid;
 }
 
 
@@ -68,6 +73,8 @@ void push_first_thread(){
 
 void init_thread(){
     clear_threads();
+    asm("mov x0, #0\n"
+        "msr tpidr_el1, x0\n");
     return ;
 }
 
@@ -97,6 +104,7 @@ void clear_threads(){
             threads[i] = NULL;
         }
     }
+    init_queue();
 }
 
 void handle_child(tid_t tid){
@@ -162,6 +170,62 @@ void printf_thread(){
             uart_printf("status: %d\n",threads[i]->status);
             uart_printf("ptid: %d\n",threads[i]->ptid);
             uart_printf("stack: 0x%x ~ 0x%x\n",threads[i]->stack,threads[i]->stack+0x10000);
+        }
+    }
+}
+
+int getpid(){
+    struct thread *t = get_current();
+    return t->tid;
+}
+
+int set_fork(void *stack,void* sp){
+    byte *t = get_current();
+    tid_t tid = Thread(return_to_child);
+    byte *child = threads[tid];
+    uint64 gap = (uint64)child - (uint64)t;
+    for(int i=0;i<sizeof(struct thread);i++){
+        child[i] = t[i];
+    }
+    struct thread *tmp = t;
+    threads[tid]->registers[0] = return_to_child;
+    threads[tid]->status = starting;
+    threads[tid]->tid = tid;
+    threads[tid]->ptid = tmp->tid;
+    threads[tid]->registers[1] = (uint64)sp + gap;
+    threads[tid]->next = NULL;
+    uint64 *tf = threads[tid]->registers[1];
+    tf[0] = 0;
+    tf[29] += gap;
+    return tid;
+}
+
+void kill(pid_t pid){
+    free_mem_table(threads[pid]);
+    free(threads[pid]);
+    threads[pid] = NULL;
+    remove_from_queue(pid);
+}
+
+void move_last_mem(tid_t tid){
+    struct thread *now = get_current();
+    void* addr;
+    for(int i=0;i<256;i++){
+        if(now->malloc_table[i] == NULL){
+            if(i == 0) return;
+            addr = now->malloc_table[i-1];
+            now->malloc_table[i-1] = NULL;
+            break;
+        }
+    }
+
+
+    struct thread *t = threads[tid];
+    for(int i=0;i<256;i++){
+        if(t->malloc_table[i] == NULL){
+            t->malloc_table[i] = addr;
+            if(i<255) t->malloc_table[i+1] = NULL;
+            break;
         }
     }
 }

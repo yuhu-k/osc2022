@@ -4,6 +4,13 @@
 #include "queue.h"
 #include "scheduler.h"
 
+void core_timer_init(){
+    uint64 tmp;
+    asm volatile("mrs %0, cntkctl_el1" : "=r"(tmp));
+    tmp |= 1;
+    asm volatile("msr cntkctl_el1, %0" : : "r"(tmp));
+    core_timer_disable();
+}
 
 void arm_core_timer_intr_handler() {
     core_timer_handler();
@@ -23,7 +30,6 @@ void core_timer_handler(){
         asm volatile("msr cntp_tval_el0, %[output0]\n"
                      ::[output0] "r" (interval));
     }
-    
     free(node);
     node->todo(node->arguments);
 }

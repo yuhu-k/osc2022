@@ -37,6 +37,8 @@ store_and_jump:
     mov x9, sp
     str x9, [x0, 16 * 6]
 
+    ldr x0, [x1, 8 * 2]
+
     mov x29, sp
 
     ldr x9, [x1, 8 * 1]
@@ -47,6 +49,7 @@ store_and_jump:
 
     ldr x9, [x1, 8 * 0]
     msr tpidr_el1, x1
+    mov x1, sp
     blr x9
 
     ldp  x0, x29, [sp, 16 * 0]
@@ -69,3 +72,4 @@ set_current:
     msr tpidr_el1, x0
     ldr x9, [x0, 8 * 0]
     blr  x9
+

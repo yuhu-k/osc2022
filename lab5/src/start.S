@@ -60,15 +60,12 @@ from_el2_to_el1:
 from_el1_to_el0:
     msr     elr_el1, x0
 
-    ldr     x1, =0x40000
-    msr     sp_el0, x1
+    msr     sp_el0,  x1
 
     adr     x0, exception_table
     msr     vbar_el1, x0
 
-    ldr     x1, =0x0
+    ldr     x1, =0x3c5
     msr     spsr_el1, x1
-
-    
 
     eret

@@ -1,7 +1,11 @@
 #include "uint.h"
 #include "thread.h"
 #include "scheduler.h"
-struct thread* run_queue = NULL, *wait_queue = NULL;
+struct thread* run_queue = NULL;
+
+void init_queue(){
+    run_queue = NULL;
+}
 
 int schedule(){
     if(run_queue == NULL){
@@ -10,7 +14,7 @@ int schedule(){
     struct thread* prev = get_current();
     struct thread* tmp = run_queue;
     run_queue = run_queue->next;
-    void* sp_addr,*pc_addr;
+
     if(tmp->status == running){
         switch_to(prev,tmp);
     }else{
@@ -19,7 +23,6 @@ int schedule(){
             set_current(tmp);
         }else{
             store_and_jump(prev,tmp);
-            return;
         }
     }
 }
@@ -31,34 +34,14 @@ void push2run_queue(struct thread* thread){
             tmp = tmp->next;
         }
         tmp->next = thread;
-        thread->next = NULL;
     }else{
-        thread->next = NULL;
         run_queue = thread;
     }
+    thread->next = NULL;
 }
 
 void wakeup_queue(struct thread *t){
-    /*struct thread *tmp = wait_queue;
-    if(tmp != NULL){
-        if(tmp->tid == t->tid){
-            wait_queue = wait_queue->next;
-            t->status = running;
-            push2run_queue(t);
-            return;
-        }else{
-            while(tmp->next != NULL){
-                if(tmp->next->tid == t->tid){
-                    tmp->next = tmp->next->next;
-                    t->status = running;
-                    push2run_queue(t);
-                    return;
-                }else{
-                    tmp = tmp->next;
-                }
-            }
-        }
-    }*/
+    if(t->status == dead) return;
     t->status = running;
     push2run_queue(t);
 }
@@ -67,3 +50,23 @@ void p(struct thread *t)
 {
     t->status = dead;
 };
+
+void exit(){
+    struct thread *t = get_current();
+    free_mem_table(t);
+    t->status = dead;
+    schedule();
+}
+
+void remove_from_queue(pid_t pid){
+    struct thread *t = run_queue;
+    if(t != NULL && t->tid == pid) run_queue = run_queue->next;
+    else if(t != NULL){
+        while(t->next != NULL){
+            if(t->next->tid == pid){
+                t->next = t->next->next;
+                return;
+            }
+        }
+    }
+}
