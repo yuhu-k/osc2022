@@ -1,6 +1,8 @@
 #include "uint.h"
 #include "thread.h"
 #include "scheduler.h"
+//#include "signal.h"
+
 struct thread* run_queue = NULL;
 extern uint64 freq_thread;
 void init_queue(){
@@ -14,8 +16,7 @@ int schedule(){
     struct thread* prev = get_current();
     struct thread* tmp = run_queue;
     run_queue = run_queue->next;
-    //run_queue->last = tmp;
-
+    sig_handler_kernel(tmp);
     if(tmp->status == running){
         switch_to(prev,tmp);
     }else if(tmp->status == dead){
@@ -39,10 +40,6 @@ void push2run_queue(struct thread* thread){
             tmp = tmp->next;
         }
         tmp->next = thread;
-        /*thread->last = run_queue->last;
-        run_queue->last->next = thread;
-        run_queue->last = thread;
-        thread->next = run_queue;*/
     }else{
         run_queue = thread;
     }
@@ -73,20 +70,4 @@ void remove_from_queue(pid_t pid){
             }
         }
     }
-    /*f(t !=NULL){
-        int tmp = t->tid;
-        if(tmp == pid){
-            run_queue->last->next = run_queue->next;
-            run_queue->next->last = run_queue->last;
-            run_queue = run_queue->next;
-            return;
-        }
-        while(t->tid != pid){
-            if(t->tid == tmp) return;
-            t = t->next;
-        }
-        t->last->next = t->next;
-        t->next->last = t->last;
-        return;
-    }*/
 }

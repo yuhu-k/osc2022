@@ -8,12 +8,9 @@
 #include "cpio.h"
 #include "mailbox.h"
 #include "queue.h"
+//#include "signal.h"
+
 #define uart_puts uart_printf
-/**
- * common exception handler
- */
-
-
 
 
 struct trapframe {
@@ -85,11 +82,11 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
                         return;
                         break;
                     case 8:
-                        kill(tf->x[0]);
+                        signal(tf->x[0],tf->x[1]);
                         return;
                         break;
                     case 9:
-                        kill(tf->x[0]);
+                        killpid(tf->x[0],tf->x[1]);
                         return;
                         break;
                     default:

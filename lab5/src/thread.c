@@ -16,7 +16,9 @@ int Thread(void *func(void),...){
     t = malloc(sizeof(struct thread));
     delete_last_mem();
     t->next = NULL;
-    t->last = NULL;
+    for(int i=0;i<32;i++) t->sig_handler[i] = NULL;
+    t->sig_handler[9] = kill;
+    t->signal = 0;
     t->status = starting;
     t->childs = NULL;
     t->registers[0] = func;
@@ -59,6 +61,7 @@ void set_first_thread(){
     t->childs = NULL;
     t->ptid = 0;
     t->tid = 0;
+    t->signal = 0;
     threads[0] = t;
     t->malloc_table[0] = NULL;
     t->next = NULL;
@@ -200,9 +203,10 @@ int set_fork(void *stack,void* sp){
     return tid;
 }
 
-void kill(pid_t pid){
+int kill(pid_t pid){
     free_mem_table(threads[pid]);
     free(threads[pid]);
+    threads[pid]->status = dead;
     threads[pid] = NULL;
     remove_from_queue(pid);
 }

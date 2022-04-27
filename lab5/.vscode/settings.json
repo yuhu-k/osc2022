@@ -6,6 +6,7 @@
         "priority_queue.h": "c",
         "type.h": "c",
         "scheduler.h": "c",
-        "random": "c"
+        "random": "c",
+        "signal.h": "c"
     }
 }

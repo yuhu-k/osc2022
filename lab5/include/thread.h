@@ -1,5 +1,6 @@
-#include "uint.h"
 #pragma once
+#define tid_t unsigned int
+#define pid_t unsigned int
 int Thread(void *func(void), ...);
 void idle();
 void init_thread();
@@ -11,7 +12,7 @@ void printf_thread();
 void record_mem(void* addr);
 int getpid();
 int set_fork(void *t,void* sp);
-void kill(pid_t pid);
+int kill(pid_t pid);
 void move_last_mem(tid_t tid);
 
 #define thread_numbers 65536
@@ -24,7 +25,8 @@ struct thread_sibling{
 struct thread{
     unsigned long long registers[2*7];
     struct thread* next;
-    struct thread* last;
+    unsigned int signal;
+    void* sig_handler[32];
     void* malloc_table[256];
     int priority;
     tid_t tid, ptid;
