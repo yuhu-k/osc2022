@@ -4,6 +4,8 @@
 #include "queue.h"
 #include "scheduler.h"
 
+uint64 freq_thread = 31;
+
 void core_timer_init(){
     uint64 tmp;
     asm volatile("mrs %0, cntkctl_el1" : "=r"(tmp));
@@ -61,3 +63,13 @@ void delay(int duration){
     schedule();
 }
 
+void thread_timer_handler(){
+    void *t = get_current();
+    push2run_queue(t);
+    thread_timer();
+    schedule();
+}
+
+void thread_timer(){
+    add_timer(thread_timer_handler,NULL,freq_thread);
+}

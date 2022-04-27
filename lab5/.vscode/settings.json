@@ -5,6 +5,7 @@
         "queue.h": "c",
         "priority_queue.h": "c",
         "type.h": "c",
-        "scheduler.h": "c"
+        "scheduler.h": "c",
+        "random": "c"
     }
 }

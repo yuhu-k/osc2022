@@ -58,9 +58,7 @@ store_and_jump:
     mov  w1, 3
     str  w1, [x0, 140]
 
-    bl   p
-
-    bl  schedule
+    bl   exit
 
 .global set_current
 set_current:

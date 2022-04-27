@@ -202,6 +202,7 @@ void check(char *input){
         name[i]='\0';
         print_content(name, cpio_start);
     }else if(strncmp(input,"./",2)){
+        irq_disable();
         char name[128];
         for(int i=0;i<128;i++) name[i] = 0;
         int i;
@@ -210,6 +211,7 @@ void check(char *input){
         }
         char *const argv[] = {name};
         execute(name,argv);
+        irq_enable();
     }else if(strcmp(input,"timer")){
         int clock_hz,now_time,interval;
         asm volatile("mrs %[input0], cntfrq_el0\n"

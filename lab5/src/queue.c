@@ -2,21 +2,25 @@
 #include "thread.h"
 #include "scheduler.h"
 struct thread* run_queue = NULL;
-
+extern uint64 freq_thread;
 void init_queue(){
     run_queue = NULL;
 }
 
 int schedule(){
-    if(run_queue == NULL){
+    start:
+    if(run_queue == NULL)
         push_first_thread();
-    }
     struct thread* prev = get_current();
     struct thread* tmp = run_queue;
     run_queue = run_queue->next;
+    //run_queue->last = tmp;
 
     if(tmp->status == running){
         switch_to(prev,tmp);
+    }else if(tmp->status == dead){
+        remove_from_queue(tmp->tid);
+        goto start;
     }else{
         tmp->status = running;
         if(tmp->tid == 0){
@@ -29,11 +33,16 @@ int schedule(){
 
 void push2run_queue(struct thread* thread){
     if(run_queue != NULL){
+        
         struct thread *tmp = run_queue;
         while(tmp->next != NULL){
             tmp = tmp->next;
         }
         tmp->next = thread;
+        /*thread->last = run_queue->last;
+        run_queue->last->next = thread;
+        run_queue->last = thread;
+        thread->next = run_queue;*/
     }else{
         run_queue = thread;
     }
@@ -45,11 +54,6 @@ void wakeup_queue(struct thread *t){
     t->status = running;
     push2run_queue(t);
 }
-
-void p(struct thread *t)
-{
-    t->status = dead;
-};
 
 void exit(){
     struct thread *t = get_current();
@@ -69,4 +73,20 @@ void remove_from_queue(pid_t pid){
             }
         }
     }
+    /*f(t !=NULL){
+        int tmp = t->tid;
+        if(tmp == pid){
+            run_queue->last->next = run_queue->next;
+            run_queue->next->last = run_queue->last;
+            run_queue = run_queue->next;
+            return;
+        }
+        while(t->tid != pid){
+            if(t->tid == tmp) return;
+            t = t->next;
+        }
+        t->last->next = t->next;
+        t->next->last = t->last;
+        return;
+    }*/
 }

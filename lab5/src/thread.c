@@ -16,6 +16,7 @@ int Thread(void *func(void),...){
     t = malloc(sizeof(struct thread));
     delete_last_mem();
     t->next = NULL;
+    t->last = NULL;
     t->status = starting;
     t->childs = NULL;
     t->registers[0] = func;
@@ -67,7 +68,6 @@ void set_first_thread(){
 }
 
 void push_first_thread(){
-    threads[0]->next = NULL;
     push2run_queue(threads[0]);
 }
 

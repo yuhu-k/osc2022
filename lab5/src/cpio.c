@@ -3,7 +3,8 @@
 #include "string.h"
 #include "excep.h"
 #include "thread.h"
-
+#include "queue.h"
+#include "scheduler.h"
 extern unsigned int cpio_start;
 
 typedef struct cpio_newc_header {  //cpio new ascii struct
@@ -121,6 +122,33 @@ void execute(char *file,char *const argv[]){
         }
         int tid = Thread(from_el1_to_el0,ucode);
         move_last_mem(0);
+        return;
+    }else{
+        uart_printf("Not found file \"%s\"\n",file);
+        return;
+    }
+}
+
+void exec(char *file,char *const argv[]){
+    uint32 f_addr=find_file_addr(file,cpio_start);
+    if(f_addr != NULL){
+        int length;
+        uint32 address = getContent(f_addr, &length);
+        char *content_addr = address;
+        if(address%4 != 0){
+            address /= 4;
+            address *= 4;
+            address += 4;
+        }
+        void * start = malloc(length + 0x20000);
+        byte *ucode = (uint64)start + 0x10000;
+        byte *file = address;
+        for(int i=0;i<length;i++){
+            ucode[i] = file[i];
+        }
+        move_last_mem(0);
+        struct thread *t = get_current();
+        from_el1_to_el0(ucode, t->stack + 65535);
         return;
     }else{
         uart_printf("Not found file \"%s\"\n",file);

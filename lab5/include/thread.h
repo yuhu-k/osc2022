@@ -24,6 +24,7 @@ struct thread_sibling{
 struct thread{
     unsigned long long registers[2*7];
     struct thread* next;
+    struct thread* last;
     void* malloc_table[256];
     int priority;
     tid_t tid, ptid;

@@ -39,8 +39,7 @@ int main() {
     setjump(&jb);
     clear_threads();
     set_first_thread();
-    schedule();
+    thread_timer();
     while (1){
-        longjump(&jb,0);
     }
 }

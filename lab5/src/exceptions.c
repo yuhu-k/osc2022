@@ -18,6 +18,7 @@
 
 struct trapframe {
     uint64 x[31]; // general register from x0 ~ x30
+    uint64 sp_el0;
     uint64 spsr_el1;
     uint64 elr_el1;
 };
@@ -63,11 +64,13 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
                         break;
                     }
                     case 3:
-                        execute(tf->x[0],tf->x[1]);
+                        exec(tf->x[0],tf->x[1]);
                         return;
                         break;
                     case 4:
+                        irq_disable();
                         tf->x[0] = set_fork(tf,sp_addr);
+                        irq_enable();
                         return;
                         break;
                     case 5:
@@ -78,6 +81,14 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
                         return;
                         break;
                     case 7:
+                        kill(tf->x[0]);
+                        return;
+                        break;
+                    case 8:
+                        kill(tf->x[0]);
+                        return;
+                        break;
+                    case 9:
                         kill(tf->x[0]);
                         return;
                         break;
