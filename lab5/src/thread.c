@@ -26,6 +26,7 @@ int Thread(void *func(void),...){
     t->registers[0] = func;
     t->registers[1] = ( (uint64)(t->stack + 0x10000) & 0xfffffff0);
     t->registers[2] = arg;
+    t->registers[4] = user_process;
     struct thread *temp = get_current();
     t->ptid = temp->tid;
     t->malloc_table[0] = NULL;

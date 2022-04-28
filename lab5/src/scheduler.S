@@ -38,6 +38,8 @@ store_and_jump:
     str x9, [x0, 16 * 6]
 
     ldr x0, [x1, 8 * 2]
+    ldr x2, [x1, 8 * 3]
+    ldr x3, [x1, 8 * 4]
 
     mov x29, sp
 
