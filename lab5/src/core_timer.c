@@ -58,13 +58,16 @@ void sleep(int duration){
 }
 
 void delay(int duration){
+    irq_disable();
     void *argu = get_current();
     add_timer(wakeup_queue,argu,duration);
+    irq_enable();
     schedule();
 }
 
 void thread_timer_handler(){
     void *t = get_current();
+    struct thread *s = t;
     push2run_queue(t);
     thread_timer();
     schedule();

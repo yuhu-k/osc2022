@@ -10,13 +10,14 @@ void init_queue(){
 }
 
 int schedule(){
-    start:
+start:
     if(run_queue == NULL)
         push_first_thread();
     struct thread* prev = get_current();
     struct thread* tmp = run_queue;
     run_queue = run_queue->next;
     sig_handler_kernel(tmp);
+    
     if(tmp->status == running){
         switch_to(prev,tmp);
     }else if(tmp->status == dead){
@@ -44,6 +45,11 @@ void push2run_queue(struct thread* thread){
         run_queue = thread;
     }
     thread->next = NULL;
+}
+
+void push2run_queue_top(struct thread* thread){
+    thread->next = run_queue;
+    run_queue = thread;
 }
 
 void wakeup_queue(struct thread *t){

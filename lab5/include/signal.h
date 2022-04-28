@@ -11,6 +11,6 @@
 
 int signal(int SIGNAL, void (*handler)());
 int killpid(int pid, int SIGNAL);
-void sig_handler_kernel(struct thread *t);
+void* sig_handler_kernel(struct thread *t);
 
 #endif

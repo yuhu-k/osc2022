@@ -8,6 +8,7 @@
 
 struct thread *threads[thread_numbers];
 
+
 int Thread(void *func(void),...){
     __builtin_va_list args;
     __builtin_va_start(args, func);
@@ -18,6 +19,7 @@ int Thread(void *func(void),...){
     t->next = NULL;
     for(int i=0;i<32;i++) t->sig_handler[i] = NULL;
     t->sig_handler[9] = kill;
+    t->sig_handler[10] = kill;
     t->signal = 0;
     t->status = starting;
     t->childs = NULL;
@@ -67,6 +69,7 @@ void set_first_thread(){
     t->next = NULL;
     t->registers[0] = idle;
     t->registers[1] = ( (uint64)(t->stack + 0x10000) & 0xfffffff0);
+    for(int i=0;i<32;i++) t->sig_handler[i] = NULL;
     push2run_queue(t);
 }
 
@@ -205,7 +208,7 @@ int set_fork(void *stack,void* sp){
 
 int kill(pid_t pid){
     free_mem_table(threads[pid]);
-    free(threads[pid]);
+    //free(threads[pid]);
     threads[pid]->status = dead;
     threads[pid] = NULL;
     remove_from_queue(pid);

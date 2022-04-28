@@ -40,6 +40,7 @@ int main() {
     clear_threads();
     set_first_thread();
     thread_timer();
+    schedule();
     while (1){
     }
 }

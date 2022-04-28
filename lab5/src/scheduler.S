@@ -71,3 +71,8 @@ set_current:
     ldr x9, [x0, 8 * 0]
     blr  x9
 
+.global set_proc
+set_proc:
+    msr tpidr_el1, x0
+    ret
+

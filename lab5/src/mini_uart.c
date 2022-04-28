@@ -3,6 +3,8 @@
 #include "buffer.h"
 #include "allocator.h"
 #include "jump.h"
+#include "signal.h"
+#include "thread.h"
 
 int transmit_interrupt_open = 0;
 char uart_buffer[1024];
@@ -174,17 +176,12 @@ void *handle_uart_irq()
             if(c == 3){
                 uart_printf("^C\n");
                 reset_flag();
-                //asm volatile("b  uart_read_line\n");
+                
                 longjump(&jb,1);
             }else{
                 write_buffer(&rbuffer,c);
-                //uart_read_line();
             }
         }
-        /*if (*AUX_MU_IER & 2 == 0){
-            *AUX_MU_IER = 3;
-            transmit_interrupt_open = 1;
-        }*/
 	}
     if((id & 0x06) == 0x02)   //transmit interrupt
 	{
