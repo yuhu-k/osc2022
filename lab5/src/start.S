@@ -59,9 +59,9 @@ from_el2_to_el1:
     eret
 
 from_el1_to_el0:
-    msr     elr_el1, x3
+    msr     elr_el1, x22
 
-    msr     sp_el0,  x1
+    msr     sp_el0,  x20
 
     adr     x9, exception_table
     msr     vbar_el1, x9
@@ -69,14 +69,12 @@ from_el1_to_el0:
     ldr     x1, =0x3c5
     msr     spsr_el1, x1
 
-    mov     x1, x2
-    mov     x9, x0
 
     eret
 
 
 user_process:
-    mov     x0, x1
-    blr     x9
+    mov     x0, x22
+    blr     x19
     mov     x8, #5
     svc     #0

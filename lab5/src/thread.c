@@ -188,18 +188,21 @@ int getpid(){
 
 int set_fork(void *stack,void* sp){
     byte *t = get_current();
-    tid_t tid = Thread(return_to_child);
+    tid_t tid = UserThread(return_to_child,NULL);
+    remove_from_queue(tid);
+    PushToReadyList(tid);
     byte *child = threads[tid];
     uint64 gap = (uint64)child - (uint64)t;
     for(int i=0;i<sizeof(struct thread);i++){
         child[i] = t[i];
     }
     struct thread *tmp = t;
-    threads[tid]->registers[0] = return_to_child;
-    threads[tid]->status = starting;
+    //threads[tid]->status = starting;
     threads[tid]->tid = tid;
     threads[tid]->ptid = tmp->tid;
-    threads[tid]->registers[1] = (uint64)sp + gap;
+    threads[tid]->registers[10] = (uint64)sp + gap;
+    threads[tid]->registers[11] = return_to_child;
+    threads[tid]->registers[12] = (uint64)sp + gap;
     threads[tid]->next = NULL;
     uint64 *tf = threads[tid]->registers[1];
     tf[0] = 0;

@@ -1,5 +1,4 @@
-.global switch_to
-switch_to:
+.macro push_registers
     stp x19, x20, [x0, 16 * 0]
     stp x21, x22, [x0, 16 * 1]
     stp x23, x24, [x0, 16 * 2]
@@ -8,15 +7,26 @@ switch_to:
     stp fp, lr, [x0, 16 * 5]
     mov x9, sp
     str x9, [x0, 16 * 6]
+.endm
 
-    ldp x19, x20, [x1, 16 * 0]
-    ldp x21, x22, [x1, 16 * 1]
-    ldp x23, x24, [x1, 16 * 2]
-    ldp x25, x26, [x1, 16 * 3]
-    ldp x27, x28, [x1, 16 * 4]
-    ldp fp, lr, [x1, 16 * 5]
-    ldr x9, [x1, 16 * 6]
+.macro pop_registers
+    ldp x19, x20, [x0, 16 * 0]
+    ldp x21, x22, [x0, 16 * 1]
+    ldp x23, x24, [x0, 16 * 2]
+    ldp x25, x26, [x0, 16 * 3]
+    ldp x27, x28, [x0, 16 * 4]
+    ldp fp, lr, [x0, 16 * 5]
+    ldr x9, [x0, 16 * 6]
     mov sp,  x9
+.endm
+
+.global switch_to
+switch_to:
+    push_registers
+
+    mov x0, x1
+
+    pop_registers
     msr tpidr_el1, x1
     mov x0, #0
     ret
@@ -28,14 +38,7 @@ get_current:
 
 .global store_and_jump
 store_and_jump:
-    stp x19, x20, [x0, 16 * 0]
-    stp x21, x22, [x0, 16 * 1]
-    stp x23, x24, [x0, 16 * 2]
-    stp x25, x26, [x0, 16 * 3]
-    stp x27, x28, [x0, 16 * 4]
-    stp fp, lr, [x0, 16 * 5]
-    mov x9, sp
-    str x9, [x0, 16 * 6]
+    push_registers
 
     ldr x0, [x1, 8 * 2]
     ldr x2, [x1, 8 * 3]
@@ -78,3 +81,48 @@ set_proc:
     msr tpidr_el1, x0
     ret
 
+.global task_schedule
+task_schedule:
+    msr daifclr, 0x0
+    push_registers
+    
+    bl  UserScheduler
+
+.global SwitchTo
+SwitchTo:
+    pop_registers
+    msr tpidr_el1, x0
+    b  check_signal
+
+.global sig_handler_assembly
+sig_handler_assembly:
+    mov x9, x0
+    mov x0, x2
+    sub x1, x1, #16
+    mov x4, sp
+    stp x4, lr, [x1, 0 * 16]
+    mov sp, x1
+    msr daifclr, 0xf
+    blr x9
+    msr daifclr, 0x0
+    ldp x0, lr, [sp, 0 * 16]
+    mov sp, x0
+    
+    ret
+
+.global check_signal
+check_signal:
+    mov x1, sp
+    sub x1, x1, 16 * 7
+    mov x2, x0
+    mov x0, x1
+    push_registers
+    mov sp, x1
+    mov x0, x2
+
+    bl  sig_handler_kernel
+
+    mov x0, sp
+    pop_registers
+    msr daifclr, 0xf
+    ret

@@ -147,9 +147,6 @@ err_han: b err_han
 
 .global return_to_child
 return_to_child:
-    mov x0, sp
-    add x0, x0, #0x10
-    mov sp, x0
     load_all
     mov x0, #0
     ret

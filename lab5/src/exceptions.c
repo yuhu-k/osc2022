@@ -8,7 +8,7 @@
 #include "cpio.h"
 #include "mailbox.h"
 #include "queue.h"
-//#include "signal.h"
+#include "task.h"
 
 #define uart_puts uart_printf
 
@@ -71,14 +71,14 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
                         return;
                         break;
                     case 5:
-                        exit();
+                        UserExit();
                         break;
                     case 6:
                         tf->x[0] = mailbox_call(tf->x[1],tf->x[0]);
                         return;
                         break;
                     case 7:
-                        kill(tf->x[0]);
+                        UserKill(tf->x[0]);
                         return;
                         break;
                     case 8:
@@ -86,7 +86,7 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
                         return;
                         break;
                     case 9:
-                        killpid(tf->x[0],tf->x[1]);
+                        sentSignal(tf->x[0],tf->x[1]);
                         return;
                         break;
                     default:

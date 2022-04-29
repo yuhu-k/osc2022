@@ -16,7 +16,6 @@ start:
     struct thread* prev = get_current();
     struct thread* tmp = run_queue;
     run_queue = run_queue->next;
-    sig_handler_kernel(tmp);
     
     if(tmp->status == running){
         switch_to(prev,tmp);
@@ -77,3 +76,4 @@ void remove_from_queue(pid_t pid){
         }
     }
 }
+

@@ -10,7 +10,7 @@
 #define SIGKILL	9
 
 int signal(int SIGNAL, void (*handler)());
-int killpid(int pid, int SIGNAL);
+int sentSignal(int pid, int SIGNAL);
 void* sig_handler_kernel(struct thread *t);
-
+void* sig_handler_assembly(void (*func)(), void *sp_addr, void* args);
 #endif

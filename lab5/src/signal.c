@@ -12,23 +12,18 @@ int signal(int SIGNAL, void (*handler)()){
     t->sig_handler[SIGNAL] = handler;
 }
 
-int killpid(int pid, int SIGNAL){
+int sentSignal(int pid, int SIGNAL){
     threads[pid]->signal |= 1<<SIGNAL;
 }
 
 void* sig_handler_kernel(struct thread *t){
     for(int i=0;i<32;i++){
         if((t->signal & 1<<i) && t->sig_handler[i] != NULL){
-            int tid = Thread(from_el1_to_el0,t->sig_handler[i]);
-            threads[tid]->registers[3] = t->tid;
-            /*int tid = Thread(t->sig_handler[i]);
-            threads[tid]->registers[2] = t->tid;*/
             t->signal &= !(1<<i);
+            void *sp = malloc(0x10000);
+            sig_handler_assembly(t->sig_handler[i], sp, NULL);
+            free(sp);
         }
     }
     return t;
-}
-
-void q(void * addr){
-    uart_printf("0x%x\n",addr);
 }

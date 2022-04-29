@@ -3,6 +3,7 @@
 #include "priority_queue.h"
 #include "queue.h"
 #include "scheduler.h"
+#include "task.h"
 
 uint64 freq_thread = 31;
 
@@ -68,9 +69,9 @@ void delay(int duration){
 void thread_timer_handler(){
     void *t = get_current();
     struct thread *s = t;
-    push2run_queue(t);
+    PushToReadyList(s->tid);
     thread_timer();
-    schedule();
+    task_schedule(t);
 }
 
 void thread_timer(){

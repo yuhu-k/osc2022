@@ -5,6 +5,7 @@
 #include "thread.h"
 #include "queue.h"
 #include "scheduler.h"
+#include "task.h"
 extern unsigned int cpio_start;
 
 typedef struct cpio_newc_header {  //cpio new ascii struct
@@ -120,8 +121,11 @@ void execute(char *file,char *const argv[]){
         for(int i=0;i<length;i++){
             ucode[i] = file[i];
         }
-        int tid = Thread(from_el1_to_el0,ucode);
+        int tid = UserThread(ucode,NULL);
+        remove_from_queue(tid);
+        PushToReadyList(tid);
         move_last_mem(0);
+        tid = Thread(InitUserTaskScheduler);
         return;
     }else{
         uart_printf("Not found file \"%s\"\n",file);
