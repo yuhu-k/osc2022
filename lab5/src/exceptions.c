@@ -13,13 +13,6 @@
 #define uart_puts uart_printf
 
 
-struct trapframe {
-    uint64 x[31]; // general register from x0 ~ x30
-    uint64 sp_el0;
-    uint64 spsr_el1;
-    uint64 elr_el1;
-};
-
 void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, unsigned long spsr, void* sp_addr)
 {
     // print out interruption type
@@ -49,6 +42,7 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
                                 }
                             }
                         }
+                        return;
                         break;
                     }
                     case 2:{
@@ -66,7 +60,7 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
                         break;
                     case 4:
                         irq_disable();
-                        tf->x[0] = set_fork(tf,sp_addr);
+                        tf->x[0] = set_fork(tf);
                         irq_enable();
                         return;
                         break;
@@ -87,6 +81,10 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
                         break;
                     case 9:
                         sentSignal(tf->x[0],tf->x[1]);
+                        return;
+                        break;
+                    case 20:
+                        ret_to_sig_han(sp_addr);
                         return;
                         break;
                     default:
@@ -174,5 +172,5 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
     uart_printf("0x%x ",spsr>>32);
     uart_printf("0x%x",spsr);
     uart_puts("\n");
-    if (type%4 == 0) reset(50);
+    //if (type%4 == 0) reset(50);
 }

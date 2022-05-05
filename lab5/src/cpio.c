@@ -121,11 +121,10 @@ void execute(char *file,char *const argv[]){
         for(int i=0;i<length;i++){
             ucode[i] = file[i];
         }
-        int tid = UserThread(ucode,NULL);
-        remove_from_queue(tid);
-        PushToReadyList(tid);
+        int tid = Thread(InitUserTaskScheduler);
         move_last_mem(0);
-        tid = Thread(InitUserTaskScheduler);
+        tid = UserThread(ucode,NULL);
+        move_last_mem(0);
         return;
     }else{
         uart_printf("Not found file \"%s\"\n",file);

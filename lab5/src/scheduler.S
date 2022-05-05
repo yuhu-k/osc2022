@@ -93,21 +93,28 @@ SwitchTo:
     pop_registers
     msr tpidr_el1, x0
     b  check_signal
+    ret
 
 .global sig_handler_assembly
 sig_handler_assembly:
-    mov x9, x0
+    mov x19, x0
     mov x0, x2
-    sub x1, x1, #16
-    mov x4, sp
-    stp x4, lr, [x1, 0 * 16]
-    mov sp, x1
+    sub sp, sp, #16
+    str lr, [sp, 0 * 16]
     msr daifclr, 0xf
-    blr x9
+    bl  from_el1_to_el0_forsig
+    mov x0, x19
+    blr x19                            //el0 start
+    mov x8, #20
+    svc #0
+
+.global ret_to_sig_han
+ret_to_sig_han:
     msr daifclr, 0x0
-    ldp x0, lr, [sp, 0 * 16]
+    add x0, x0, #0x110
     mov sp, x0
-    
+    ldr lr, [sp, 0 * 16]
+    add sp, sp, #16
     ret
 
 .global check_signal
@@ -126,3 +133,25 @@ check_signal:
     pop_registers
     msr daifclr, 0xf
     ret
+
+from_el1_to_el0_forsig:
+    msr     elr_el1, lr
+
+    msr     sp_el0,  x1
+
+    ldr     x1, =0
+    msr     spsr_el1, x1
+
+
+    eret
+
+.global get_el
+get_el:
+    mrs x0, CurrentEL
+    asr x0, x0, #2
+    and x0, x0, #3
+
+.global call_exit
+call_exit:
+    mov x8, #5
+    svc #0

@@ -37,6 +37,8 @@ void init_allocator(){
     b = find_property_value("/memory@0\0","reg\0");
     base_addr = letobe(*b);
     end_addr = letobe(*(b+1));
+    //base_addr = 0;
+    //end_addr = 0x3b400000;
     frame_num = (end_addr - base_addr)/page_size;
     frame_array = simple_malloc(frame_num * sizeof(struct FrameArray));
     frame_array[0].val = log2(frame_num);

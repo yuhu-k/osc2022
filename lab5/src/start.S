@@ -20,8 +20,6 @@ _start:
     // set stack pointer
     ldr     x1, =_start
     mov     sp, x1
-
-
     // clear bss
     ldr     x1, =__bss_start
     ldr     x2, =__bss_size
@@ -39,7 +37,7 @@ _start:
 
 
 from_el2_to_el1:
-    ldr     x1, =0x60000
+    ldr     x1, =0x80000
     msr     sp_el1, x1
 
     ldr     x1, =0  //close MMU
@@ -55,6 +53,10 @@ from_el2_to_el1:
     msr     spsr_el2, x0
 
     msr     elr_el2, lr
+
+    
+    adr     x9, exception_table
+    msr     vbar_el1, x9
     
     eret
 
@@ -63,10 +65,7 @@ from_el1_to_el0:
 
     msr     sp_el0,  x20
 
-    adr     x9, exception_table
-    msr     vbar_el1, x9
-
-    ldr     x1, =0x3c5
+    ldr     x1, =0x3c0
     msr     spsr_el1, x1
 
 

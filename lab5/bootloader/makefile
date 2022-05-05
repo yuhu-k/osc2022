@@ -31,9 +31,9 @@ clean:
 	rm -rf out
 
 run: all
-	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial stdio -d int
+	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial stdio -d int 
 tty:
-	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial pty -initrd initramfs.cpio
+	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial pty -initrd initramfs.cpio -dtb bcm2710-rpi-3-b-plus.dtb -d int
 debug: 
 	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial stdio -initrd initramfs.cpio
 dev:

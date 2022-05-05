@@ -75,5 +75,6 @@ void thread_timer_handler(){
 }
 
 void thread_timer(){
+    while(delete_first_node() != NULL);
     add_timer(thread_timer_handler,NULL,freq_thread);
 }

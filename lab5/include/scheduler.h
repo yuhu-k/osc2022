@@ -7,3 +7,5 @@ void set_current(void* addr);
 void set_proc(void* addr);
 void SwitchTo(void* addr);
 void task_schedule(void *addr);
+void call_exit();
+void ret_to_sig_han(void *sp_addr);

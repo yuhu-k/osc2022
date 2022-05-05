@@ -30,7 +30,7 @@ $(DUM_DIR)/%.o: $(SRC_DIR)/%.S
 	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@
 
 $(DUM_DIR)/%.o: $(SRC_DIR)/%.c
-	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
 
 $(DUM_DIR): 
 	mkdir -p $(DUM_DIR)
@@ -57,12 +57,15 @@ clean:
 	rm usercode.img
 
 run: all
-	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial stdio -initrd initramfs.cpio -d int
+	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial stdio -initrd initramfs.cpio -dtb  bcm2710-rpi-3-b-plus.dtb 
 tty:
 	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial pty
 debug: 
-	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -S -s -initrd initramfs.cpio -d int
+	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -S -s -initrd initramfs.cpio -d int -dtb  bcm2710-rpi-3-b-plus.dtb
 dev:
 	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial stdio -initrd initramfs.cpio -dtb bcm2710-rpi-3-b-plus.dtb 
 
-
+super: all
+	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -serial null -serial pty -initrd initramfs.cpio -dtb  bcm2710-rpi-3-b-plus.dtb -d int -S -s
+screen: all
+	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -serial null -serial pty -initrd initramfs.cpio -dtb  bcm2710-rpi-3-b-plus.dtb -d int

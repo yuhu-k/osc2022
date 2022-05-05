@@ -1,6 +1,7 @@
 #pragma once
 #define tid_t unsigned int
 #define pid_t unsigned int
+
 int Thread(void *func(void), ...);
 void idle();
 void init_thread();
@@ -11,7 +12,7 @@ void push_first_thread();
 void printf_thread();
 void record_mem(void* addr);
 int getpid();
-int set_fork(void *t,void* sp);
+int set_fork(void* sp);
 int kill(pid_t pid);
 void move_last_mem(tid_t tid);
 
@@ -38,5 +39,6 @@ struct thread{
     } status;
     struct thread_sibling *childs;
     unsigned char stack[0x10000];
+    unsigned char *kstack;
 };
 

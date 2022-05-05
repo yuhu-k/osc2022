@@ -39,7 +39,6 @@ int main() {
     setjump(&jb);
     clear_threads();
     set_first_thread();
-    
     schedule();
     while (1){
     }

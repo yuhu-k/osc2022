@@ -54,6 +54,7 @@ uint64 add_node(void (*callback_f)(),void* arguments,uint64 times,uint64 time_ga
 }
 
 struct node* delete_first_node(){
+    if(nodes == NULL) return NULL;
     uint64 times=nodes->time_to_ring;
     struct node *t = nodes;
     nodes = nodes->next;

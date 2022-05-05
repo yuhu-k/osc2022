@@ -1,6 +1,6 @@
 // save general registers to stack
 .macro save_all
-    sub sp, sp, 16 * 17
+    sub sp, sp, #0x110
     stp x0, x1, [sp ,16 * 0]
     stp x2, x3, [sp ,16 * 1]
     stp x4, x5, [sp ,16 * 2]
@@ -52,7 +52,7 @@
     ldp x28, x29, [sp ,16 * 14]
     ldr x30, [sp, 16 * 15]    
 
-    add sp, sp, 16 * 17
+    add sp, sp, #0x110
 .endm
 
 .macro exception_handler type
@@ -147,6 +147,5 @@ err_han: b err_han
 
 .global return_to_child
 return_to_child:
-    load_all
-    mov x0, #0
-    ret
+    load_all   
+    eret
