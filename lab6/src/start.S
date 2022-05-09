@@ -21,6 +21,8 @@ _start:
 
     ldr     x1, =__dtb_addr
     str     x0, [x1]
+
+    bl      disable_mmu
     
     // set stack pointer
     ldr     x1, =_start
@@ -47,7 +49,7 @@ boot_rest:
 
 
 from_el2_to_el1:
-    ldr     x1, =0x80000
+    ldr     x1, =0xffff000000080000
     msr     sp_el1, x1
 
     mov     x1, (0b11 << 20) // make el0, el1 can use Floating point and Advanced SIMD

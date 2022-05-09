@@ -1,7 +1,7 @@
 __heap_size = 0x100000;
 SECTIONS
 {
-  . = 0xffff00000000;
+  . = 0xffff000000000000;
   . += 0x80000;
   _begin_ = .;
   .text :

@@ -111,7 +111,7 @@ void uart_printf(char* fmt, ...) {
                 uart_printf(arg);
             }else if(*fmt == 'x'){
                 int arg =  __builtin_va_arg(args, int);
-                char temp[10];
+                char temp[20];
                 i16toa(arg,temp,8);
                 uart_printf(temp);
             }else if(*fmt == 'c'){
