@@ -1,0 +1,929 @@
+make all --print-data-base --no-builtin-variables --no-builtin-rules --question
+# GNU Make 4.2.1
+# Built for x86_64-pc-linux-gnu
+# Copyright (C) 1988-2016 Free Software Foundation, Inc.
+# License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+# This is free software: you are free to change and redistribute it.
+# There is NO WARRANTY, to the extent permitted by law.
+
+# Make data base, printed on Sun May  8 22:43:24 2022
+
+# Variables
+
+# automatic
+<D = $(patsubst %/,%,$(dir $<))
+# automatic
+?F = $(notdir $?)
+# environment
+WSLENV = ELECTRON_RUN_AS_NODE/w:WT_SESSION::WT_PROFILE_ID
+# default
+.SHELLFLAGS := -c
+# environment
+VSCODE_LOG_NATIVE = false
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# automatic
+@D = $(patsubst %/,%,$(dir $@))
+# automatic
+@F = $(notdir $@)
+# makefile
+CURDIR := /home/yuhu/osc2022/lab6
+# makefile
+SHELL = /bin/sh
+# makefile (from 'makefile', line 9)
+USER_SRC_DIR = user/src
+# environment
+VSCODE_NLS_CONFIG = {"locale":"zh-tw","availableLanguages":{}}
+# environment
+_ = /mnt/c/Users/yh084/AppData/Local/Programs/Microsoft VS Code/bin/code
+# makefile (from 'makefile', line 1)
+MAKEFILE_LIST :=  makefile
+# makefile (from 'makefile', line 21)
+USER_OBJSS = $(USER_SRCSS:$(USER_SRC_DIR)/%.S=$(USER_DUM_DIR)/%.o)
+# 'override' directive
+GNUMAKEFLAGS := 
+# environment
+VSCODE_VERBOSE_LOGGING = true
+# makefile (from 'makefile', line 15)
+OBJS = $(SRCS:$(SRC_DIR)/%.c=$(DUM_DIR)/%.o)
+# makefile (from 'makefile', line 14)
+SRCSS = $(wildcard $(SRC_DIR)/*.S)
+# makefile (from 'makefile', line 4)
+CPP = g++-11
+# environment
+VSCODE_CWD = /mnt/c/Users/yh084/AppData/Local/Programs/Microsoft VS Code
+# default
+MAKE_HOST := x86_64-pc-linux-gnu
+# environment
+PATH = /home/yuhu/.vscode-server/bin/57fd6d0195bb9b9d1b49f6da5db789060795de47/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/usbipd-win/:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/ProgramData/DockerDesktop/version-bin:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA NvDLISR:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Users/yh084/scoop/shims:/mnt/c/Users/yh084/AppData/Local/Programs/Python/Python310/Scripts/:/mnt/c/Users/yh084/AppData/Local/Programs/Python/Python310/:/mnt/c/Users/yh084/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/yh084/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/yh084/script:/mnt/c/Users/yh084/AppData/Local/GitHubDesktop/bin
+# environment
+LSCOLORS = Gxfxcxdxbxegedabagacad
+# environment
+XDG_RUNTIME_DIR = /mnt/wslg/runtime-dir
+# makefile (from 'makefile', line 1)
+tool_chain = aarch64-linux-gnu-
+# environment
+VSCODE_LOG_STACK = false
+# environment
+VSCODE_IPC_HOOK_CLI = /mnt/wslg/runtime-dir/vscode-ipc-14c66546-64da-4c63-83c3-801e0107bab5.sock
+# default
+.FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
+# makefile (from 'makefile', line 13)
+SRCHS = $(wildcard $(INC_DIR)/*.h)
+# environment
+LS_COLORS = rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:
+# automatic
+%F = $(notdir $%)
+# environment
+DISPLAY = :0
+# environment
+VSCODE_PIPE_LOGGING = true
+# environment
+PWD = /home/yuhu/osc2022/lab6
+# default
+.LOADED := 
+# environment
+WSL_INTEROP = /run/WSL/8_interop
+# environment
+PULSE_SERVER = /mnt/wslg/PulseServer
+# environment
+WT_SESSION = 422405bd-5fa1-42fe-86c7-ad478e7db1a4
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+# environment
+HOME = /home/yuhu
+# makefile (from 'makefile', line 19)
+USER_SRCSS = $(wildcard $(USER_SRC_DIR)/*.S)
+# makefile (from 'makefile', line 20)
+USER_OBJS = $(USER_SRCS:$(USER_SRC_DIR)/%.c=$(USER_DUM_DIR)/%.o)
+# environment
+LOGNAME = yuhu
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+# environment
+ZSH = /home/yuhu/.oh-my-zsh
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+# environment
+MAKELEVEL := 0
+# default
+MAKE = $(MAKE_COMMAND)
+# default
+MAKECMDGOALS := all
+# makefile (from 'makefile', line 12)
+SRCS = $(wildcard $(SRC_DIR)/*.c)
+# environment
+SHLVL = 1
+# makefile (from 'makefile', line 3)
+CC = gcc-10
+# default
+MAKE_VERSION := 4.2.1
+# environment
+USER = yuhu
+# makefile
+.DEFAULT_GOAL := all
+# makefile (from 'makefile', line 16)
+OBJSS = $(SRCSS:$(SRC_DIR)/%.S=$(DUM_DIR)/%.o)
+# environment
+NAME = Code
+# environment
+LESS = -R
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# environment
+VSCODE_WSL_EXT_LOCATION = /mnt/c/Users/yh084/.vscode/extensions/ms-vscode-remote.remote-wsl-0.66.2
+# default
+MAKE_COMMAND := make
+# environment
+OLDPWD = /mnt/c/Users/yh084/AppData/Local/Programs/Microsoft VS Code
+# default
+.VARIABLES := 
+# automatic
+*F = $(notdir $*)
+# makefile
+MAKEFLAGS = pqrR
+# environment
+MFLAGS = -pqrR
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# automatic
++F = $(notdir $+)
+# environment
+VSCODE_HANDLES_SIGPIPE = true
+# environment
+WT_PROFILE_ID = {2c4de342-38b7-51cf-b940-2309a097f518}
+# default
+MAKEFILES := 
+# makefile (from 'makefile', line 6)
+SRC_DIR = src
+# automatic
+<F = $(notdir $<)
+# makefile (from 'makefile', line 2)
+SIMU_ENV = qemu-system-aarch64
+# makefile (from 'makefile', line 18)
+USER_SRCS = $(wildcard $(USER_SRC_DIR)/*.c)
+# environment
+PAGER = less
+# environment
+LC_ALL = C
+# environment
+HOSTTYPE = x86_64
+# automatic
+^F = $(notdir $^)
+# default
+SUFFIXES := 
+# environment
+WAYLAND_DISPLAY = wayland-0
+# default
+.INCLUDE_DIRS = /usr/include /usr/local/include /usr/include
+# default
+.RECIPEPREFIX := 
+# environment
+LANG = C
+# environment
+TERM = xterm-256color
+# makefile (from 'makefile', line 7)
+DUM_DIR = out
+# environment
+VSCODE_EXTHOST_WILL_SEND_SOCKET = true
+# environment
+WSL_DISTRO_NAME = Ubuntu
+# makefile (from 'makefile', line 10)
+USER_DUM_DIR = user/out
+# makefile (from 'makefile', line 8)
+INC_DIR = include
+# variable set hash-table stats:
+# Load=93/1024=9%, Rehash=0, Collisions=7/151=5%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# . (device 2080, inode 18958): 17 files, no impossibilities.
+# src (device 2080, inode 49683): 36 files, no impossibilities.
+# user/src (device 2080, inode 49718): 4 files, no impossibilities.
+
+# 57 files, no impossibilities in 3 directories.
+
+# Implicit Rules
+
+out/%.o: src/%.S
+#  recipe to execute (from 'makefile', line 32):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@
+
+out/%.o: src/%.c
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+user/out/%.o: user/src/%.S
+#  recipe to execute (from 'makefile', line 47):
+	$(tool_chain)$(CC) -g -Wall -I user/include -c $< -o $@
+
+user/out/%.o: user/src/%.c
+#  recipe to execute (from 'makefile', line 50):
+	$(tool_chain)$(CC) -g -Wall -I user/include -c $< -o $@ -fno-stack-protector
+
+# 4 implicit rules, 0 (0.0%) terminal.
+
+# Files
+
+# Not a target:
+src/signal.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6571473
+#  File has been updated.
+#  Successfully updated.
+
+out/string.o: src/string.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'string'
+#  Last modified 2022-05-08 22:40:58.9099892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+# Not a target:
+user/out/main.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+out/core_timer.o: src/core_timer.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'core_timer'
+#  Last modified 2022-05-08 22:40:58.3699892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+# Not a target:
+src/excep_handler.S:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6671473
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+src/interrupt_queue.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6671473
+#  File has been updated.
+#  Successfully updated.
+
+all: kernel8.img sender
+ 
+#  Phony target (prerequisite of .PHONY).
+#  Command line target.
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has been updated.
+#  Successfully updated.
+
+screen: all
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 72):
+	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -serial null -serial pty -initrd initramfs.cpio -dtb  bcm2710-rpi-3-b-plus.dtb -d int
+
+out/main.o: src/main.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'main'
+#  Last modified 2022-05-08 22:40:58.6999892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+out/task.o: src/task.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'task'
+#  Last modified 2022-05-08 22:40:58.5099892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+# Not a target:
+src/mmu_asm.S:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-08 22:23:18.3899892
+#  File has been updated.
+#  Successfully updated.
+
+.PHONY: all clean run debug tty
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+out/math.o: src/math.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'math'
+#  Last modified 2022-05-08 22:40:58.5699892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+# Not a target:
+src/local_timer.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6671473
+#  File has been updated.
+#  Successfully updated.
+
+out/scheduler.o: src/scheduler.S
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'scheduler'
+#  Last modified 2022-05-08 22:40:58.9899892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 32):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@
+
+out/priority_queue.o: src/priority_queue.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'priority_queue'
+#  Last modified 2022-05-08 22:40:58.8099892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+# Not a target:
+src/loadimg.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6771473
+#  File has been updated.
+#  Successfully updated.
+
+out/dtb.o: src/dtb.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'dtb'
+#  Last modified 2022-05-08 22:40:58.4099892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+# Not a target:
+src/shell.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-08 22:38:44.6499892
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+src/jump.S:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6671473
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+src/mmu.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-08 21:01:23.3199892
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+src/thread.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6571473
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+src/temp.S:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6771473
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+src/exceptions.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6671473
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+src/cpio.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6671473
+#  File has been updated.
+#  Successfully updated.
+
+out/mini_uart.o: src/mini_uart.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'mini_uart'
+#  Last modified 2022-05-08 22:40:58.5499892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+out/reboot.o: src/reboot.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'reboot'
+#  Last modified 2022-05-08 22:40:58.8199892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+out/mailbox.o: src/mailbox.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'mailbox'
+#  Last modified 2022-05-08 22:40:58.4299892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+debug:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 65):
+	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -S -s -initrd initramfs.cpio -d int -dtb  bcm2710-rpi-3-b-plus.dtb
+
+# Not a target:
+src/buffer.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6671473
+#  File has been updated.
+#  Successfully updated.
+
+user/out:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 53):
+	mkdir -p $(USER_DUM_DIR)
+
+# Not a target:
+src/linker.ld:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-08 22:33:37.9699892
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+src/timer.S:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6771473
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+src/getopt.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6571473
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+src/start.S:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-08 22:39:47.9899892
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+makefile:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-08 22:43:13.7399892
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+src/irq2.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6671473
+#  File has been updated.
+#  Successfully updated.
+
+usercode.img: user/out user/out/main.o user/out/system.o
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 44):
+	$(tool_chain)$(CC) -o usercode.img $(USER_OBJS) $(USER_OBJSS)
+
+out:
+#  Implicit rule search has not been done.
+#  Last modified 2022-05-08 22:40:59.0299892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 38):
+	mkdir -p $(DUM_DIR)
+
+# Not a target:
+src/core_timer.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6671473
+#  File has been updated.
+#  Successfully updated.
+
+out/panic.o: src/panic.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'panic'
+#  Last modified 2022-05-08 22:40:58.2999892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+out/queue.o: src/queue.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'queue'
+#  Last modified 2022-05-08 22:40:58.4599892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+out/allocator.o: src/allocator.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'allocator'
+#  Last modified 2022-05-08 22:40:58.6099892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+# Not a target:
+ 
+src/main.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6671473
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+src/task.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6671473
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+src/scheduler.S:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6671473
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+src/math.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6771473
+#  File has been updated.
+#  Successfully updated.
+
+out/irq.o: src/irq.S
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'irq'
+#  Last modified 2022-05-08 22:40:58.9799892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 32):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@
+
+# Not a target:
+src/priority_queue.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6771473
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+user/out/system.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+src/dtb.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6671473
+#  File has been updated.
+#  Successfully updated.
+
+dev:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 67):
+	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial stdio -initrd initramfs.cpio -dtb bcm2710-rpi-3-b-plus.dtb 
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+out/signal.o: src/signal.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'signal'
+#  Last modified 2022-05-08 22:40:58.6799892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+# Not a target:
+src/mini_uart.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6771473
+#  File has been updated.
+#  Successfully updated.
+
+run: all
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 61):
+	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial stdio -initrd initramfs.cpio -dtb  bcm2710-rpi-3-b-plus.dtb 
+
+# Not a target:
+src/reboot.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6771473
+#  File has been updated.
+#  Successfully updated.
+
+clean:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 56):
+	rm -rf kernel8.*
+	rm -rf out
+	rm sender
+
+# Not a target:
+src/mailbox.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6671473
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+sendfile.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6571473
+#  File has been updated.
+#  Successfully updated.
+
+out/excep_handler.o: src/excep_handler.S
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'excep_handler'
+#  Last modified 2022-05-08 22:40:59.0299892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 32):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@
+
+out/interrupt_queue.o: src/interrupt_queue.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'interrupt_queue'
+#  Last modified 2022-05-08 22:40:58.9299892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+super: all
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 70):
+	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -serial null -serial pty -initrd initramfs.cpio -dtb  bcm2710-rpi-3-b-plus.dtb -d int -S -s
+
+out/local_timer.o: src/local_timer.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'local_timer'
+#  Last modified 2022-05-08 22:40:58.6599892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+out/mmu_asm.o: src/mmu_asm.S
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'mmu_asm'
+#  Last modified 2022-05-08 22:40:59.0199892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 32):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@
+
+out/loadimg.o: src/loadimg.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'loadimg'
+#  Last modified 2022-05-08 22:40:58.8399892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+out/shell.o: src/shell.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'shell'
+#  Last modified 2022-05-08 22:40:58.7399892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+out/mmu.o: src/mmu.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'mmu'
+#  Last modified 2022-05-08 22:40:58.3199892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+out/thread.o: src/thread.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'thread'
+#  Last modified 2022-05-08 22:40:58.8799892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+out/jump.o: src/jump.S
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'jump'
+#  Last modified 2022-05-08 22:40:58.9699892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 32):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@
+
+out/exceptions.o: src/exceptions.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'exceptions'
+#  Last modified 2022-05-08 22:40:58.4799892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+out/cpio.o: src/cpio.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'cpio'
+#  Last modified 2022-05-08 22:40:58.6499892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+out/temp.o: src/temp.S
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'temp'
+#  Last modified 2022-05-08 22:40:59.0099892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 32):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@
+
+# Not a target:
+src/panic.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6771473
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+src/queue.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6571473
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+src/allocator.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6671473
+#  File has been updated.
+#  Successfully updated.
+
+kernel8.img: out out/panic.o out/mmu.o out/getopt.o out/core_timer.o out/dtb.o out/mailbox.o out/queue.o out/exceptions.o out/task.o out/mini_uart.o out/math.o out/allocator.o out/cpio.o out/local_timer.o out/signal.o out/main.o out/shell.o out/buffer.o out/irq2.o out/priority_queue.o out/reboot.o out/loadimg.o out/thread.o out/string.o out/interrupt_queue.o out/start.o out/timer.o out/jump.o out/irq.o out/scheduler.o out/temp.o out/mmu_asm.o out/excep_handler.o src/linker.ld
+#  Implicit rule search has not been done.
+#  Last modified 2022-05-08 22:40:59.0399892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 28):
+	$(tool_chain)ld -T $(SRC_DIR)/linker.ld -o kernel8.elf $(OBJS) $(OBJSS)
+	$(tool_chain)objcopy -O binary kernel8.elf kernel8.img
+
+# Not a target:
+src/irq.S:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6671473
+#  File has been updated.
+#  Successfully updated.
+
+out/buffer.o: src/buffer.c
+ 
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'buffer'
+#  Last modified 2022-05-08 22:40:58.7599892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+# Not a target:
+src/string.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-07 01:32:20.6771473
+#  File has been updated.
+#  Successfully updated.
+
+tty:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 63):
+	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial pty
+
+out/getopt.o: src/getopt.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'getopt'
+#  Last modified 2022-05-08 22:40:58.3399892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+out/timer.o: src/timer.S
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'timer'
+#  Last modified 2022-05-08 22:40:58.9499892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 32):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@
+
+sender: sendfile.cpp
+#  Implicit rule search has not been done.
+#  Last modified 2022-05-08 22:40:59.4199892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 41):
+	$(CPP) sendfile.cpp -o sender
+
+out/start.o: src/start.S
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'start'
+#  Last modified 2022-05-08 22:40:58.9399892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 32):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@
+
+out/irq2.o: src/irq2.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'irq2'
+#  Last modified 2022-05-08 22:40:58.7799892
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'makefile', line 35):
+	$(tool_chain)$(CC) -g -Wall -I include -c $< -o $@ -fno-stack-protector -mstrict-align
+
+# files hash-table stats:
+# Load=87/1024=8%, Rehash=0, Collisions=9/279=3%
+# VPATH Search Paths
+
+# No 'vpath' search paths.
+
+# No general ('VPATH' variable) search path.
+
+# strcache buffers: 1 (0) / strings = 200 / storage = 2219 B / avg = 11 B
+# current buf: size = 8162 B / used = 2219 B / count = 200 / avg = 11 B
+
+# strcache performance: lookups = 277 / hit rate = 27%
+# hash-table stats:
+# Load=200/8192=2%, Rehash=0, Collisions=6/277=2%
+# Finished Make data base on Sun May  8 22:43:24 2022
+
+ 

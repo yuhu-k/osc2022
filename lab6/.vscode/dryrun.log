@@ -1,0 +1,5 @@
+make --dry-run --keep-going --print-directory
+make: Entering directory '/home/yuhu/osc2022/lab6'
+make: Nothing to be done for 'all'.
+make: Leaving directory '/home/yuhu/osc2022/lab6'
+ 
