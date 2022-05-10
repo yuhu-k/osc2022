@@ -27,13 +27,6 @@ SECTIONS
   }
   . = ALIGN(4096);
 
-  pg_dir = .;
-  .data.pgd :
-  {
-    . += (2 * (1 << 12));
-  }
-  . = ALIGN(0x1000);
-
   . = . + 0x100000;
 
   .heap :
@@ -52,4 +45,4 @@ SECTIONS
 
 }
 __bss_size = (__bss_end - __bss_start) >> 3;
-__dtb_addr = 0x02080000;
+__dtb_addr = 0xffff000002080000;

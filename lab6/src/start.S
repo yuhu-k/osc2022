@@ -18,10 +18,8 @@ _start:
     b       1b
     // if cpu_id == 0
 2:
-
-    ldr     x1, =__dtb_addr
-    str     x0, [x1]
-
+    //mov     x1, 0x02080000
+    //str     x0, [x1]
     bl      disable_mmu
     
     // set stack pointer
@@ -29,9 +27,7 @@ _start:
     mov     sp, x1
 
     bl      from_el2_to_el1
-
     bl      setup_mmu
-    b       1b
 
 boot_rest:
     // clear bss
@@ -41,6 +37,7 @@ boot_rest:
     str     xzr, [x1], #8
     sub     x2, x2, #1
     cbnz    x2, 3b
+
     
 
 4:  bl      main
@@ -49,7 +46,7 @@ boot_rest:
 
 
 from_el2_to_el1:
-    ldr     x1, =0xffff000000080000
+    ldr     x1, =_start
     msr     sp_el1, x1
 
     mov     x1, (0b11 << 20) // make el0, el1 can use Floating point and Advanced SIMD

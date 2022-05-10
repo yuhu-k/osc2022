@@ -60,11 +60,10 @@ identity_paging:
 
 2:  mov     x1, 0x2000
     ldr     x2, = BOOT_PMD0_ATTR_RAM
-    mov     x3, 0x1F8
+    mov     x3, 0x1f7
     mov     x4, xzr
-    mov     x5, 8
 
-3:  mul     x6, x4, x5
+3:  lsl     x6, x4, 3
     add     x7, x1, x6
     lsl     x8, x4, 21
     orr     x8, x2, x8
@@ -73,7 +72,7 @@ identity_paging:
     cmp     x4, x3
     b.ls    3b
 
-4:  cmp     x4, 0x200
+4:  cmp     x4, 0x1ff
     bge     5f
     ldr     x2, = BOOT_PMD0_ATTR_MMIO
     mov     x3, 0x200

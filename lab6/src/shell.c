@@ -33,7 +33,7 @@ void shell_init(){
     uart_flush();
     core_timer_init();
     init_allocator();
-    uint64 *ramf_start,*ramf_end;
+    uint32 *ramf_start,*ramf_end;
     ramf_start=find_property_value("/chosen\0","linux,initrd-start\0");  //get ramf start addr from dtb
     ramf_end=find_property_value("/chosen\0","linux,initrd-end\0"); //get ramf end addr from dtb
     if(ramf_start != 0){
@@ -56,6 +56,7 @@ void shell_init(){
     memory_reserve(0x0,0x80000);  //Kernel stack
 
     init_thread();
+
 }
 
 void reset_flag(){

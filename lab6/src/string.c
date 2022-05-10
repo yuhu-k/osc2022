@@ -28,7 +28,7 @@ void ftoa(float *value, int precise, char *s) {
 
 void i16toa(unsigned int value, char *s, int digits) {
     int idx = 0;
-    char tmp[20];
+    char tmp[11];
     int tidx = 0;
     do {
         if((value % 16) < 10)

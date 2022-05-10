@@ -5,12 +5,10 @@ CPP = g++-11
 
 SRC_DIR = src
 DUM_DIR = out
-INC_DIR = include
 USER_SRC_DIR = user/src
 USER_DUM_DIR = user/out
 
 SRCS = $(wildcard $(SRC_DIR)/*.c)
-SRCHS = $(wildcard $(INC_DIR)/*.h)
 SRCSS = $(wildcard $(SRC_DIR)/*.S)
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(DUM_DIR)/%.o)
 OBJSS = $(SRCSS:$(SRC_DIR)/%.S=$(DUM_DIR)/%.o)
@@ -22,7 +20,7 @@ USER_OBJSS = $(USER_SRCSS:$(USER_SRC_DIR)/%.S=$(USER_DUM_DIR)/%.o)
 
 .PHONY: all clean run debug tty
 
-all: kernel8.img sender
+all: kernel8.img sender 
 
 kernel8.img: $(DUM_DIR) $(OBJS) $(OBJSS) $(SRC_DIR)/linker.ld
 	$(tool_chain)ld -T $(SRC_DIR)/linker.ld -o kernel8.elf $(OBJS) $(OBJSS)
