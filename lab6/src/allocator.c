@@ -7,10 +7,10 @@
 #define page_size 4096    //4KB
 extern unsigned char __heap_start;
 
-uint32 base_addr;
-uint32 end_addr;
+uint64_t base_addr;
+uint64_t end_addr;
 
-uint32 frame_num;
+uint64_t frame_num;
 
 struct FrameArray** frame_list;
 struct FrameArray* frame_array;
@@ -21,8 +21,8 @@ struct mem_reserved_pool *MR_pool;
 
 
 void* simple_malloc(unsigned int size) {
-    uint32 *temp=(uint32*)(&__heap_start-8);
-    uint32 addr = ((uint32) &__heap_start) + *temp;
+    uint64_t *temp=(uint64_t*)(&__heap_start-8);
+    uint64_t addr = ((uint64_t) &__heap_start) + *temp;
     if(size%16 != 0){
         size /= 16;
         size *= 16;
@@ -33,12 +33,12 @@ void* simple_malloc(unsigned int size) {
 }
 
 void init_allocator(){
-    uint32 *b,*e;
+    uint32_t *b,*e;
     b = find_property_value("/memory@0\0","reg\0");
     base_addr = letobe(*b);
     end_addr = letobe(*(b+1));
-    //base_addr = 0;
-    //end_addr = 0x3b400000;
+    base_addr |= 0xffff000000000000;
+    end_addr |= 0xffff000000000000;
     frame_num = (end_addr - base_addr)/page_size;
     frame_array = simple_malloc(frame_num * sizeof(struct FrameArray));
     frame_array[0].val = log2(frame_num);
@@ -224,7 +224,8 @@ void* malloc(size_t size){
     tmp->status[0] = 0;
     void* addr = tmp->start;
     record_mem(addr);
-    return addr;
+    uint64_t res = (uint64_t)addr | 0xffff000000000000;
+    return res;
 }
 
 void pool_status(){
@@ -263,7 +264,7 @@ void clear_pool(){
     }
 }
 
-void memory_reserve(uint32 start,uint32 end){
+void memory_reserve(uint64 start,uint64 end){
     if(end < start) return;
     struct mem_reserved_pool *tmp;
     tmp = MR_pool;

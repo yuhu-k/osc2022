@@ -5,9 +5,29 @@
 #include "scheduler.h"
 #include "allocator.h"
 #include "excep.h"
+#include "mmu.h"
+#include "cpio.h"
 
 struct thread* ReadyList = NULL;
 extern struct thread *threads[thread_numbers];
+
+uint64_t mmu_decode(uint64_t va, pagetable_t *p){
+    pagetable_t *pt = (uint64_t) p & 0xfffffffc;
+    uint64_t blocksize = 0x8000000000;
+    pt = (uint64_t)pt->entries[va/blocksize] & 0xfffffffc;
+    va %= blocksize;
+    blocksize >>= 9;
+    pt = (uint64_t)pt->entries[va/blocksize] & 0xfffffffc;
+    va %= blocksize;
+    blocksize >>= 9;
+    pt = (uint64_t)pt->entries[va/blocksize] & 0xfffffffc;
+    va %= blocksize;
+    blocksize >>= 9;
+    pt = (uint64_t)pt->entries[va/blocksize] & 0xfffffffc;
+    va %= blocksize;
+    uint64_t re = ((uint64_t)pt&0xfffffffffffff000) + va;
+    return re;
+}
 
 void UserScheduler(){
     if(ReadyList == NULL){
@@ -15,6 +35,7 @@ void UserScheduler(){
         exit();
     }else{
         struct thread *t = ReadyListPop();
+        set_ttbr0_el1(t->page_table);
         SwitchTo(t);
     }
 }
@@ -73,28 +94,40 @@ int UserKill(pid_t pid){
 int UserThread(void* func,void* arg){
     struct thread *t;
     t = malloc(sizeof(struct thread));
-    unsigned char* kstack = malloc(0x10000);
+    for(int i=0;i<thread_numbers;i++){
+        if(threads[i] == NULL){
+            threads[i] = t;
+            t->tid = i;
+            break;
+        }
+    }
     delete_last_mem();
+    unsigned char* kstack = malloc(0x10000);
     t->next = NULL;
     for(int i=0;i<32;i++) t->sig_handler[i] = NULL;
     t->sig_handler[9] = call_exit;
     t->sig_handler[10] = UserKill;
+    t->page_table = (uint64_t)allocate_page() | 0b11;
     t->signal = 0;
     t->childs = NULL;
+    t->ustack = malloc(0x4000);
     t->kstack = kstack;
-    t->registers[0] = func;
-    t->registers[1] = ( (uint64)(t->stack + 0x10000) & 0xfffffff0);
+    t->registers[0] = 0x0;
+    t->registers[1] = 0xfffffffff000;
     t->registers[2] = arg;
-    t->registers[3] = user_process;
-    t->registers[10] = (unsigned long long)(kstack + 0x10000) & 0xfffffff0;
+    t->registers[10] = ( (uint64)(t->kstack + 0x10000) & 0xfffffffffffffff0);
     t->registers[11] = from_el1_to_el0;
     t->registers[12] = t->registers[10];
+    SetTaskStackPagetable(t->page_table, t->ustack);
     struct thread *temp = get_current();
     t->ptid = temp->tid;
     t->malloc_table[0] = NULL;
     struct thread_sibling *temp2 = temp->childs;
     struct thread_sibling *new_child = malloc(sizeof(struct thread_sibling));
-    delete_last_mem();
+    move_last_mem(t->tid);
+    move_last_mem(t->tid);
+    move_last_mem(t->tid);
+    move_last_mem(t->tid);
     void *a;
     new_child->self = t;
     new_child->next = NULL;
@@ -105,13 +138,6 @@ int UserThread(void* func,void* arg){
             temp2 = temp2->next;
         }
         temp2->next = new_child;
-    }
-    for(int i=0;i<thread_numbers;i++){
-        if(threads[i] == NULL){
-            threads[i] = t;
-            t->tid = i;
-            break;
-        }
     }
     PushToReadyList(t->tid);
     return t->tid;
@@ -142,4 +168,14 @@ int set_fork(void* sp){
     tf->x[0] = 0;
     tf->x[29] += gap;
     return tid;
+}
+
+void execute(char *file,char *const argv[]){
+    void* code = NULL;
+    uint64_t length = 0;
+    copy_content(file, &code, &length);
+    if(code == NULL || length == 0) return;
+    int tid = UserThread(code,NULL);
+    SetTaskCodePagetable(threads[tid]->page_table,code,length);
+    InitUserTaskScheduler();
 }

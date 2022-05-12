@@ -6,6 +6,7 @@
 #include "queue.h"
 #include "scheduler.h"
 #include "task.h"
+#include "mmu.h"
 extern unsigned int cpio_start;
 
 typedef struct cpio_newc_header {  //cpio new ascii struct
@@ -104,7 +105,7 @@ void print_content(char *file, uint32 addr){
     }
 }
 
-void execute(char *file,char *const argv[]){
+void copy_content(char *file,void **addr, uint64_t *size){
     uint32 f_addr=find_file_addr(file,cpio_start);
     if(f_addr != NULL){
         int length;
@@ -116,16 +117,14 @@ void execute(char *file,char *const argv[]){
             address += 4;
         }
         void * start = malloc(length + 0x20000);
+        move_last_mem(0);
         byte *ucode = (uint64)start + 0x10000;
         byte *file = address;
         for(int i=0;i<length;i++){
             ucode[i] = file[i];
         }
-        int tid = Thread(InitUserTaskScheduler);
-        move_last_mem(0);
-        tid = UserThread(ucode,NULL);
-        move_last_mem(0);
-        return;
+        *addr = ucode;
+        *size = length;
     }else{
         uart_printf("Not found file \"%s\"\n",file);
         return;
@@ -151,7 +150,7 @@ void exec(char *file,char *const argv[]){
         }
         move_last_mem(0);
         struct thread *t = get_current();
-        from_el1_to_el0(ucode, t->stack + 65535);
+        from_el1_to_el0(ucode, t->ustack + 0x10000);
         return;
     }else{
         uart_printf("Not found file \"%s\"\n",file);

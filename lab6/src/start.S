@@ -67,7 +67,7 @@ from_el2_to_el1:
     eret
 
 from_el1_to_el0:
-    msr     elr_el1, x22
+    msr     elr_el1, x19
 
     msr     sp_el0,  x20
 
@@ -77,9 +77,3 @@ from_el1_to_el0:
 
     eret
 
-
-user_process:
-    mov     x0, x22
-    blr     x19
-    mov     x8, #5
-    svc     #0

@@ -148,8 +148,9 @@ from_el1_to_el0_forsig:
 .global get_el
 get_el:
     mrs x0, CurrentEL
-    asr x0, x0, #2
+    lsr x0, x0, #2
     and x0, x0, #3
+    ret
 
 .global call_exit
 call_exit:

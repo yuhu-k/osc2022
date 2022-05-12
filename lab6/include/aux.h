@@ -1,4 +1,4 @@
-#include "mmio.h"
+#include "peripheral/mmio.h"
 
 #define AUX_BASE        (MMIO_BASE + 0x215000)
 

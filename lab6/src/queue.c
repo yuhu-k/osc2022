@@ -34,7 +34,6 @@ start:
 
 void push2run_queue(struct thread* thread){
     if(run_queue != NULL){
-        
         struct thread *tmp = run_queue;
         while(tmp->next != NULL){
             tmp = tmp->next;

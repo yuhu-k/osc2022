@@ -22,3 +22,11 @@ int log2(int logarithm){
 int exp2(int exponent){
     return exp(2,exponent);
 }
+
+long long upper_bound(long long dividend, long long divisor){
+    return dividend%divisor == 0 ? dividend/divisor : dividend/divisor+1;
+}
+
+unsigned long long min(unsigned long long a,unsigned long long b){
+    return a>=b ? b:a;
+}

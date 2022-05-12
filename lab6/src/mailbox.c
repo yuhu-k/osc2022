@@ -1,5 +1,5 @@
 #include "mini_uart.h"
-#include "mmio.h"
+#include "peripheral/mmio.h"
 #include "string.h"
 typedef unsigned int uint32;
 typedef unsigned char byte;

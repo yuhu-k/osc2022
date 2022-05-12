@@ -1,9 +1,10 @@
 make --dry-run --always-make --keep-going --print-directory
-make: Entering directory '/home/yuhu/osc2022/lab123'
+make: Entering directory '/home/yuhu/osc2022/lab6'
 mkdir -p out
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/panic.c -o out/panic.o -fno-stack-protector -mstrict-align
-aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/core_timer.c -o out/core_timer.o -fno-stack-protector -mstrict-align
+aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/mmu.c -o out/mmu.o -fno-stack-protector -mstrict-align
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/getopt.c -o out/getopt.o -fno-stack-protector -mstrict-align
+aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/core_timer.c -o out/core_timer.o -fno-stack-protector -mstrict-align
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/dtb.c -o out/dtb.o -fno-stack-protector -mstrict-align
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/mailbox.c -o out/mailbox.o -fno-stack-protector -mstrict-align
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/queue.c -o out/queue.o -fno-stack-protector -mstrict-align
@@ -13,7 +14,6 @@ aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/mini_uart.c -o out/mini_uart
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/math.c -o out/math.o -fno-stack-protector -mstrict-align
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/allocator.c -o out/allocator.o -fno-stack-protector -mstrict-align
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/cpio.c -o out/cpio.o -fno-stack-protector -mstrict-align
- 
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/local_timer.c -o out/local_timer.o -fno-stack-protector -mstrict-align
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/signal.c -o out/signal.o -fno-stack-protector -mstrict-align
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/main.c -o out/main.o -fno-stack-protector -mstrict-align
@@ -26,20 +26,16 @@ aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/loadimg.c -o out/loadimg.o -
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/thread.c -o out/thread.o -fno-stack-protector -mstrict-align
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/string.c -o out/string.o -fno-stack-protector -mstrict-align
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/interrupt_queue.c -o out/interrupt_queue.o -fno-stack-protector -mstrict-align
- 
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/start.S -o out/start.o
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/timer.S -o out/timer.o
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/jump.S -o out/jump.o
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/irq.S -o out/irq.o
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/scheduler.S -o out/scheduler.o
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/temp.S -o out/temp.o
+aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/mmu_asm.S -o out/mmu_asm.o
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/excep_handler.S -o out/excep_handler.o
-aarch64-linux-gnu-ld -T src/linker.ld -o kernel8.elf out/panic.o out/task.o out/mini_uart.o out/core_timer.o out/exceptions.o out/queue.o out/dtb.o out/allocator.o out/math.o out/main.o out/priority_queue.o out/reboot.o out/thread.o out/string.o out/mailbox.o out/getopt.o out/loadimg.o out/cpio.o out/local_timer.o out/signal.o out/shell.o out/buffer.o out/irq2.o out/interrupt_queue.o out/timer.o out/temp.o out/start.o out/jump.o out/irq.o out/scheduler.o out/excep_handler.o
+aarch64-linux-gnu-ld -T src/linker.ld -o kernel8.elf out/panic.o out/mini_uart.o out/core_timer.o out/exceptions.o out/queue.o out/dtb.o out/task.o out/allocator.o out/mmu.o out/math.o out/main.o out/priority_queue.o out/reboot.o out/thread.o out/string.o out/mailbox.o out/getopt.o out/loadimg.o out/cpio.o out/local_timer.o out/signal.o out/shell.o out/buffer.o out/irq2.o out/interrupt_queue.o out/timer.o out/temp.o out/start.o out/jump.o out/irq.o out/scheduler.o out/mmu_asm.o out/excep_handler.o
 aarch64-linux-gnu-objcopy -O binary kernel8.elf kernel8.img
 g++-11 sendfile.cpp -o sender
-mkdir -p user/out
-aarch64-linux-gnu-gcc-10 -g -Wall -I user/include -c user/src/main.c -o user/out/main.o -fno-stack-protector
-aarch64-linux-gnu-gcc-10 -g -Wall -I user/include -c user/src/system.S -o user/out/system.o
-aarch64-linux-gnu-gcc-10 -o usercode.img user/out/main.o user/out/system.o
-make: Leaving directory '/home/yuhu/osc2022/lab123'
+make: Leaving directory '/home/yuhu/osc2022/lab6'
  

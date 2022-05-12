@@ -4,7 +4,7 @@ void i16toa(int value, char *s, int digits);
 int strcmp(char *string1, char *string2);
 int strncmp(char *string1, char *string2, int length);
 void strcpy(char *string1, char* string2, int length);
-unsigned int letobe(unsigned int o);
+unsigned long long letobe(unsigned long long o);
 void strccat(char *string1, char* string2, char *string_out);
 int atoi(char *s);
 int a16toi(char *s);

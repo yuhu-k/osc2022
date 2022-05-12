@@ -38,7 +38,8 @@ struct thread{
         dead
     } status;
     struct thread_sibling *childs;
-    unsigned char stack[0x10000];
+    unsigned char *ustack;
     unsigned char *kstack;
+    void *page_table;
 };
 

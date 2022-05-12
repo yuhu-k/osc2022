@@ -24,10 +24,10 @@ int Thread(void *func(void),...){
     t->signal = 0;
     t->status = starting;
     t->childs = NULL;
+    t->ustack = malloc(0x10000);
     t->registers[0] = func;
-    t->registers[1] = ( (uint64)(t->stack + 0x10000) & 0xfffffff0);
+    t->registers[1] = ( (uint64)(t->ustack + 0x10000) & 0xfffffffffffffff0);
     t->registers[2] = arg;
-    t->registers[4] = user_process;
     struct thread *temp = get_current();
     t->ptid = temp->tid;
     t->malloc_table[0] = NULL;
@@ -52,6 +52,7 @@ int Thread(void *func(void),...){
             break;
         }
     }
+    move_last_mem(t->tid);
     push2run_queue(t);
     return t->tid;
 }
@@ -69,8 +70,10 @@ void set_first_thread(){
     threads[0] = t;
     t->malloc_table[0] = NULL;
     t->next = NULL;
+    t->ustack = malloc(0x10000);
+    move_last_mem(0);
     t->registers[0] = idle;
-    t->registers[1] = ( (uint64)(t->stack + 0x10000) & 0xfffffff0);
+    t->registers[1] = ( (uint64)(t->ustack + 0x10000) & 0xfffffff0);
     for(int i=0;i<32;i++) t->sig_handler[i] = NULL;
     push2run_queue(t);
 }
@@ -177,7 +180,7 @@ void printf_thread(){
             uart_printf("addr: 0x%x\n",threads[i]);
             uart_printf("status: %d\n",threads[i]->status);
             uart_printf("ptid: %d\n",threads[i]->ptid);
-            uart_printf("stack: 0x%x ~ 0x%x\n",threads[i]->stack,threads[i]->stack+0x10000);
+            uart_printf("stack: 0x%x ~ 0x%x\n",threads[i]->ustack,threads[i]->ustack+0x10000);
         }
     }
 }

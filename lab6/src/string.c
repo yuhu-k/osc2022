@@ -85,13 +85,14 @@ void strcpy(char *string1, char* string2, int length){
     string2[length]='\0';
 }
 
-uint32 letobe(uint32 o){
+uint64 letobe(uint64 o){
     byte *temp = (byte*) &o;
-    uint32 result=0;
+    uint64 result=0;
     for(int i=0;i<4;i++){
         result *= 256;
         result += temp[i];
     }
+    
     return result;
 }
 

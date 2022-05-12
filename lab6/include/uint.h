@@ -12,5 +12,9 @@
 #define true  1
 #define tid_t uint32
 #define pid_t uint32
+#define uint64_t uint64
+#define uint32_t uint32
+#define uint16_t uint16
+#define byte_t byte
 
 #endif

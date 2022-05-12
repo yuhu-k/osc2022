@@ -1,4 +1,4 @@
-#include "mmio.h"
+#include "peripheral/mmio.h"
 
 #define GPIO_BASE       (MMIO_BASE + 0x200000)
 

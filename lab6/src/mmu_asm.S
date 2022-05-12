@@ -5,6 +5,7 @@
 .global identity_paging
 .global page_table_set
 .global setup_mmu
+.global set_ttbr0_el1
 
 disable_mmu:
     ldr     x1, =0  //close MMU
@@ -93,4 +94,12 @@ setup_mmu:
     bl      set_tcr
     bl      set_mair
     bl      identity_paging
+    ret
+
+set_ttbr0_el1:
+    dsb ish // ensure write has completed
+    msr ttbr0_el1, x0 // switch translation based address.
+    tlbi vmalle1is // invalidate all TLB entries
+    dsb ish // ensure completion of TLB invalidatation
+    isb // clear pipeline
     ret
