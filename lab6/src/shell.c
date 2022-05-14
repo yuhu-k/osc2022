@@ -34,7 +34,6 @@ void shell_init(){
     uart_flush();
     core_timer_init();
     init_allocator();
-    fb_init();
     uint64 *ramf_start,*ramf_end;
     ramf_start=find_property_value("/chosen\0","linux,initrd-start\0");  //get ramf start addr from dtb
     ramf_end=find_property_value("/chosen\0","linux,initrd-end\0"); //get ramf end addr from dtb
@@ -277,7 +276,6 @@ void check(char *input){
     }else if(strcmp(cmd->argv[0],"test")){
         get_board_revision();
         get_arm_memory();
-        fb_splash();
     }else{
         uart_printf("command not found: %s\n",input);
     }

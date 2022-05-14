@@ -186,3 +186,13 @@ void execute(char *file,char *const argv[]){
     SetTaskCodePagetable(threads[tid]->page_table,code,length);
     InitUserTaskScheduler();
 }
+
+void exec(char *file,char *const argv[]){
+    void* code = NULL;
+    uint64_t length = 0;
+    copy_content(file, &code, &length);
+    if(code == NULL || length == 0) return;
+    struct thread *t = get_current();
+    SetTaskCodePagetable(t->page_table,code,length);
+    from_el1_to_el0(code, t->ustack + 0x4000);
+}

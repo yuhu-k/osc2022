@@ -71,7 +71,7 @@ void set_first_thread(){
     t->malloc_table[0] = NULL;
     t->next = NULL;
     t->ustack = malloc(0x10000);
-    move_last_mem(0);
+    delete_last_mem();
     t->registers[0] = idle;
     t->registers[1] = ( (uint64)(t->ustack + 0x10000) & 0xfffffffffffffff0);
     for(int i=0;i<32;i++) t->sig_handler[i] = NULL;
@@ -103,6 +103,7 @@ void idle(){
     while(1){
         handle_child(0);
         kill_zombies();
+        free_mem_table(threads[0]);
         Thread(uart_read_line);
         schedule();  
     }

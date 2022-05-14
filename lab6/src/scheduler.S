@@ -111,7 +111,6 @@ sig_handler_assembly:
 .global ret_to_sig_han
 ret_to_sig_han:
     msr daifclr, 0x0
-    add x0, x0, #0x110
     mov sp, x0
     ldr lr, [sp, 0 * 16]
     add sp, sp, #16

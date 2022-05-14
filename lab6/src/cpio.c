@@ -116,9 +116,9 @@ void copy_content(char *file,void **addr, uint64_t *size){
             address *= 4;
             address += 4;
         }
-        void * start = malloc(length + 0x20000);
+        void * start = malloc(length);
         move_last_mem(0);
-        byte *ucode = (uint64)start + 0x10000;
+        byte *ucode = (uint64)start;
         byte *file = address;
         for(int i=0;i<length;i++){
             ucode[i] = file[i];
@@ -131,29 +131,3 @@ void copy_content(char *file,void **addr, uint64_t *size){
     }
 }
 
-void exec(char *file,char *const argv[]){
-    uint64_t f_addr=find_file_addr(file,cpio_start);
-    if(f_addr != NULL){
-        int length;
-        uint64_t address = getContent(f_addr, &length);
-        char *content_addr = address;
-        if(address%4 != 0){
-            address /= 4;
-            address *= 4;
-            address += 4;
-        }
-        void * start = malloc(length + 0x20000);
-        byte *ucode = (uint64)start + 0x10000;
-        byte *file = address;
-        for(int i=0;i<length;i++){
-            ucode[i] = file[i];
-        }
-        move_last_mem(0);
-        struct thread *t = get_current();
-        from_el1_to_el0(ucode, t->ustack + 0x10000);
-        return;
-    }else{
-        uart_printf("Not found file \"%s\"\n",file);
-        return;
-    }
-}
