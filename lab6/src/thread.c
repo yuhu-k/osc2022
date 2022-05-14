@@ -73,7 +73,7 @@ void set_first_thread(){
     t->ustack = malloc(0x10000);
     move_last_mem(0);
     t->registers[0] = idle;
-    t->registers[1] = ( (uint64)(t->ustack + 0x10000) & 0xfffffff0);
+    t->registers[1] = ( (uint64)(t->ustack + 0x10000) & 0xfffffffffffffff0);
     for(int i=0;i<32;i++) t->sig_handler[i] = NULL;
     push2run_queue(t);
 }
@@ -192,18 +192,17 @@ int getpid(){
 
 int kill(pid_t pid){
     free_mem_table(threads[pid]);
-    //free(threads[pid]);
     threads[pid]->status = dead;
     threads[pid] = NULL;
     remove_from_queue(pid);
 }
 
-void move_last_mem(tid_t tid){
+int move_last_mem(tid_t tid){
     struct thread *now = get_current();
     void* addr;
     for(int i=0;i<256;i++){
         if(now->malloc_table[i] == NULL){
-            if(i == 0) return;
+            if(i == 0) return -1;
             addr = now->malloc_table[i-1];
             now->malloc_table[i-1] = NULL;
             break;
@@ -216,7 +215,7 @@ void move_last_mem(tid_t tid){
         if(t->malloc_table[i] == NULL){
             t->malloc_table[i] = addr;
             if(i<255) t->malloc_table[i+1] = NULL;
-            break;
+            return 0;
         }
     }
 }

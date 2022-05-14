@@ -12,20 +12,20 @@ struct thread* ReadyList = NULL;
 extern struct thread *threads[thread_numbers];
 
 uint64_t mmu_decode(uint64_t va, pagetable_t *p){
-    pagetable_t *pt = (uint64_t) p & 0xfffffffc;
+    pagetable_t *pt = ((uint64_t) p & 0xfffffffc) | 0xffff000000000000;
     uint64_t blocksize = 0x8000000000;
-    pt = (uint64_t)pt->entries[va/blocksize] & 0xfffffffc;
+    pt = ((uint64_t)pt->entries[va/blocksize] & 0xfffffffc) | 0xffff000000000000;
     va %= blocksize;
     blocksize >>= 9;
-    pt = (uint64_t)pt->entries[va/blocksize] & 0xfffffffc;
+    pt = ((uint64_t)pt->entries[va/blocksize] & 0xfffffffc) | 0xffff000000000000;
     va %= blocksize;
     blocksize >>= 9;
-    pt = (uint64_t)pt->entries[va/blocksize] & 0xfffffffc;
+    pt = ((uint64_t)pt->entries[va/blocksize] & 0xfffffffc) | 0xffff000000000000;
     va %= blocksize;
     blocksize >>= 9;
-    pt = (uint64_t)pt->entries[va/blocksize] & 0xfffffffc;
+    pt = ((uint64_t)pt->entries[va/blocksize] & 0xfffffffc);
     va %= blocksize;
-    uint64_t re = ((uint64_t)pt&0xfffffffffffff000) + va;
+    uint64_t re = ((uint64_t)pt&0xfffffffff000) + va;
     return re;
 }
 
@@ -107,7 +107,7 @@ int UserThread(void* func,void* arg){
     for(int i=0;i<32;i++) t->sig_handler[i] = NULL;
     t->sig_handler[9] = call_exit;
     t->sig_handler[10] = UserKill;
-    t->page_table = (uint64_t)allocate_page() | 0b11;
+    t->page_table = ((uint64_t)allocate_page() | 0b11) &  ~0xffff000000000000;
     t->signal = 0;
     t->childs = NULL;
     t->ustack = malloc(0x4000);
@@ -119,6 +119,7 @@ int UserThread(void* func,void* arg){
     t->registers[11] = from_el1_to_el0;
     t->registers[12] = t->registers[10];
     SetTaskStackPagetable(t->page_table, t->ustack);
+    SetPeripherialPagetable(t->page_table);
     struct thread *temp = get_current();
     t->ptid = temp->tid;
     t->malloc_table[0] = NULL;
@@ -146,14 +147,18 @@ int UserThread(void* func,void* arg){
 int set_fork(void* sp){
     byte *t = get_current();
     tid_t tid = UserThread(return_to_child,NULL);
-    free(threads[tid]->kstack);
+    pagetable_t* pagetable = ((uint64_t)threads[tid]->page_table & ~(uint64_t)0b11) | 0xffff000000000000;
+    unsigned char* kstack = threads[tid]->kstack;
+    unsigned char* ustack =  threads[tid]->ustack;
+
     byte *child = threads[tid];
     uint64 gap = (uint64)child - (uint64)t;
     for(int i=0;i<sizeof(struct thread);i++){
         child[i] = t[i];
     }
-    unsigned char* kstack = malloc(0x10000);
+
     struct thread *tmp = t;
+    pagetable_t *tmp_pt = ((uint64_t)tmp->page_table & ~(uint64_t)0b11) | 0xffff000000000000;
     struct trapframe *tf = (uint64)kstack + (uint64)sp - (uint64)tmp->kstack;
     threads[tid]->tid = tid;
     threads[tid]->ptid = tmp->tid;
@@ -162,11 +167,13 @@ int set_fork(void* sp){
     threads[tid]->registers[12] = tf;
     threads[tid]->next = NULL;
     threads[tid]->kstack = kstack;
+    threads[tid]->ustack = ustack;
+    threads[tid]->page_table = ((uint64_t)pagetable | 0b11) & ~0xffff000000000000;
     for(int i=0;i<0x10000;i++) kstack[i] = tmp->kstack[i];
-    tf->sp_el0 += gap;
+    for(int i=0;i<0x4000;i++) ustack[i] = tmp->ustack[i];
+    for(int i=0;i<5;i++) pagetable->entries[i] = tmp_pt->entries[i];
     tf->spsr_el1 = 0;
     tf->x[0] = 0;
-    tf->x[29] += gap;
     return tid;
 }
 

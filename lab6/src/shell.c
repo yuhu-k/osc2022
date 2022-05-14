@@ -9,6 +9,7 @@
 #include "getopt.h"
 #include "scheduler.h"
 #include "loadimg.h"
+#include "mailbox.h"
 
 struct ARGS{
     char** argv;
@@ -18,7 +19,7 @@ struct ARGS{
 
 extern unsigned char __heap_start, _end_, _begin_;
 extern byte __dtb_addr;
-uint64 cpio_start,cpio_end;
+uint64_t cpio_start,cpio_end;
 char cmd_buffer[1024];
 unsigned int cmd_index = 0;
 unsigned int cmd_flag  = 0;
@@ -33,6 +34,7 @@ void shell_init(){
     uart_flush();
     core_timer_init();
     init_allocator();
+    fb_init();
     uint64 *ramf_start,*ramf_end;
     ramf_start=find_property_value("/chosen\0","linux,initrd-start\0");  //get ramf start addr from dtb
     ramf_end=find_property_value("/chosen\0","linux,initrd-end\0"); //get ramf end addr from dtb
@@ -273,7 +275,9 @@ void check(char *input){
     }else if(strcmp(cmd->argv[0],"lp")){
         loadimg();
     }else if(strcmp(cmd->argv[0],"test")){
-        Thread(fork_test);
+        get_board_revision();
+        get_arm_memory();
+        fb_splash();
     }else{
         uart_printf("command not found: %s\n",input);
     }

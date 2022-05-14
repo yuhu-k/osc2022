@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "uint.h": "c",
-        "mmu.h": "c"
+        "mmu.h": "c",
+        "mini_uart.h": "c"
     }
 }

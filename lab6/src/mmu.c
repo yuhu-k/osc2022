@@ -22,7 +22,7 @@ pte_t walk(pagetable_t *pt, uint64_t va, uint64_t end, uint64_t pa, uint64_t blo
             pt = allocate_page();
             move_last_mem(0);
         }else{
-            pt = (uint64_t)pt & ~(uint64_t)0x3;
+            pt = ((uint64_t)pt & ~(uint64_t)0x3) | 0xffff000000000000;
         }
         for(int i=0;i<num;i++){
             uint64_t va2;
@@ -47,4 +47,8 @@ void SetTaskStackPagetable(pagetable_t *pt, void* stack_addr){
 
 void SetTaskCodePagetable(pagetable_t *pt, void* code_addr, uint64_t size){
     mappages(pt,0x0, size, (uint64_t)code_addr & 0xfffffffc);
+}
+
+void SetPeripherialPagetable(pagetable_t *pt){
+    mappages(pt,0x3c000000, 0x4000000, 0x3c000000);
 }

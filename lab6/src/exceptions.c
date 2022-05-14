@@ -60,17 +60,28 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
                         break;
                     case 4:
                         irq_disable();
-                        tf->x[0] = set_fork(tf);
+                        tf->x[0] = set_fork(sp_addr);
                         irq_enable();
                         return;
                         break;
                     case 5:
                         UserExit();
                         break;
-                    case 6:
-                        tf->x[0] = mailbox_call(tf->x[1],tf->x[0]);
+                    case 6:{
+                        uint32_t* mbox = malloc(*(uint32_t*)(tf->x[1]));
+                        for(int i=0;i<*(uint32_t*)(tf->x[1]) / 4;i++){
+                            uint32_t tr = *((uint32_t*)(tf->x[1]) + i);
+                            mbox[i] = tr;
+                        }
+                        unsigned char channel = tf->x[0];
+                        mailbox_call(mbox,channel);
+                        for(int i=0;i<*(uint32_t*)(tf->x[1]) / 4;i++){
+                            *((uint32_t*)(tf->x[1]) + i) = mbox[i];
+                        }
+                        free(mbox);
                         return;
                         break;
+                    }
                     case 7:
                         UserKill(tf->x[0]);
                         return;

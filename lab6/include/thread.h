@@ -14,7 +14,7 @@ void record_mem(void* addr);
 int getpid();
 int set_fork(void* sp);
 int kill(pid_t pid);
-void move_last_mem(tid_t tid);
+int move_last_mem(tid_t tid);
 
 #define thread_numbers 65536
 

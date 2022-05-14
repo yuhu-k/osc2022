@@ -18,8 +18,8 @@ _start:
     b       1b
     // if cpu_id == 0
 2:
-    //mov     x1, 0x02080000
-    //str     x0, [x1]
+    mov     x1, 0x02080000
+    str     x0, [x1]
     bl      disable_mmu
     
     // set stack pointer
