@@ -18,6 +18,8 @@
 
 #define RO_BIT (1 << 7)
 #define RW_BIT (0 << 7)
+#define USR_EXE_NEVER_BIT (1 << 54)
+#define KERNEL_EXE_NEVER_BIT (1 << 53)   //if set RW_BIT and USER_KERNEL_BIT, then KERNEL_EXE_BIT will be ineffective
 #define ONLY_KERNEL_BIT (0 << 6)
 #define USER_KERNEL_BIT (1 << 6)
 #define PGD_ATTR PD_TABLE
@@ -25,4 +27,9 @@
 #define PMD_ATTR PD_TABLE
 #define PTE_ATTR_CODE (PD_ACCESS | USER_KERNEL_BIT | RO_BIT | (MAIR_IDX_NORMAL_NOCACHE << 2) | PD_TABLE)
 #define PTE_ATTR_STACK (PD_ACCESS | USER_KERNEL_BIT | RW_BIT | (MAIR_IDX_NORMAL_NOCACHE << 2) | PD_TABLE)
+#define PTE_ATTR_BASE (USER_KERNEL_BIT | (MAIR_IDX_NORMAL_NOCACHE << 2) | PD_TABLE)
 
+#define PROT_NONE  (0)
+#define PROT_READ  (1 << 0)
+#define PROT_WRITE (1 << 1)
+#define PROT_EXEC  (1 << 2)

@@ -43,3 +43,4 @@ struct thread{
     void *page_table;
 };
 
+typedef struct thread thread_t;

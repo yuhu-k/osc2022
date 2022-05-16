@@ -1,4 +1,7 @@
+#ifndef __mmu__
+#define __mmu__
 #define pte_t unsigned long long
+#define size_t unsigned int
 typedef struct{pte_t entries[512];} pagetable_t;
 void disable_mmu();
 void setup_mmu();
@@ -7,3 +10,7 @@ pagetable_t* allocate_page();
 void SetTaskStackPagetable(pagetable_t *pt, void* stack_addr);
 void SetTaskCodePagetable(pagetable_t *pt, void* code_addr, unsigned long long size);
 void SetPeripherialPagetable(pagetable_t *pt);
+void* mmap_set(void* addr, size_t len, int prot, int flags);
+unsigned char mmap_check(unsigned long long FAR);
+
+#endif

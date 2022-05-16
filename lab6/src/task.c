@@ -11,24 +11,6 @@
 struct thread* ReadyList = NULL;
 extern struct thread *threads[thread_numbers];
 
-uint64_t mmu_decode(uint64_t va, pagetable_t *p){
-    pagetable_t *pt = ((uint64_t) p & 0xfffffffc) | 0xffff000000000000;
-    uint64_t blocksize = 0x8000000000;
-    pt = ((uint64_t)pt->entries[va/blocksize] & 0xfffffffc) | 0xffff000000000000;
-    va %= blocksize;
-    blocksize >>= 9;
-    pt = ((uint64_t)pt->entries[va/blocksize] & 0xfffffffc) | 0xffff000000000000;
-    va %= blocksize;
-    blocksize >>= 9;
-    pt = ((uint64_t)pt->entries[va/blocksize] & 0xfffffffc) | 0xffff000000000000;
-    va %= blocksize;
-    blocksize >>= 9;
-    pt = ((uint64_t)pt->entries[va/blocksize] & 0xfffffffc);
-    va %= blocksize;
-    uint64_t re = ((uint64_t)pt&0xfffffffff000) + va;
-    return re;
-}
-
 void UserScheduler(){
     if(ReadyList == NULL){
         core_timer_disable();
