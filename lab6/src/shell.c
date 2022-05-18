@@ -10,6 +10,7 @@
 #include "scheduler.h"
 #include "loadimg.h"
 #include "mailbox.h"
+#include "mmu.h"
 
 struct ARGS{
     char** argv;
@@ -62,6 +63,7 @@ void shell_init(){
 
     init_thread();
 
+    cow_init();
 }
 
 void reset_flag(){

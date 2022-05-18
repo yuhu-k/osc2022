@@ -12,5 +12,8 @@ void SetTaskCodePagetable(pagetable_t *pt, void* code_addr, unsigned long long s
 void SetPeripherialPagetable(pagetable_t *pt);
 void* mmap_set(void* addr, size_t len, int prot, int flags);
 unsigned char mmap_check(unsigned long long FAR);
+void map_pages(unsigned long long des, unsigned long long src);
+void cow_init();
+unsigned long long get_ttbr0_el1();
 
 #endif

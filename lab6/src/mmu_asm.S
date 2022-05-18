@@ -103,3 +103,7 @@ set_ttbr0_el1:
     dsb ish // ensure completion of TLB invalidatation
     isb // clear pipeline
     ret
+.global get_ttbr0_el1
+get_ttbr0_el1:
+    mrs x0, ttbr0_el1
+    ret

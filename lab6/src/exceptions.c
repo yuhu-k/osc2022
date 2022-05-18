@@ -106,7 +106,7 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
                     default:
                         break;
                 }
-            }else if(esr>>26 == 0b100100){
+            }else if(esr>>26==0b100100 || esr>>26==0b100101){
                 uint64_t far;
                 asm volatile("mrs %[input0],far_el1\n"
                              : [input0] "=r" (far));
