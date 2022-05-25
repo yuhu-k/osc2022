@@ -80,9 +80,9 @@ int strncmp(char *string1, char *string2, int length){
     return strcmp(temp1,temp2);
 }
 
-void strcpy(char *string1, char* string2, int length){
-    for(int i=0;i<length;i++) string2[i]=string1[i];
-    string2[length]='\0';
+void strcpy(const char *string1, char* string2, int length){
+    int i;
+    for(i=0;i<length && string1[i] != '\0';i++) string2[i]=string1[i];
 }
 
 uint64 letobe(uint64 o){
@@ -142,4 +142,10 @@ int a16ntoi(char *num, int length){  // transform hex string to int
         }
     }
     return namesize;
+}
+
+void *memset(void *str, int c, size_t n){
+    unsigned char* string = (unsigned long)str + c;
+    for(int i=0;i<n;i++) *string++ = 0;
+    return str;
 }

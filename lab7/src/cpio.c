@@ -27,7 +27,8 @@ typedef struct cpio_newc_header {  //cpio new ascii struct
 }CPIO_H ;
 
 
-void list(uint64_t addr){ // proceed ls
+void list(){ // proceed ls
+    uint64_t addr = cpio_start;
     CPIO_H *cpio=(CPIO_H*) addr;
     while(strncmp(cpio->c_magic,"070701\0",6)==1){ //c_magic is always "070701"
         int namesize=a16ntoi(cpio->c_namesize, 8);

@@ -4,6 +4,8 @@
         "mmu.h": "c",
         "mini_uart.h": "c",
         "queue.h": "c",
-        "task.h": "c"
-    }
+        "task.h": "c",
+        "vfs.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
 }

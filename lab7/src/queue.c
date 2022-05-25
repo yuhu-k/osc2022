@@ -1,7 +1,6 @@
 #include "uint.h"
 #include "thread.h"
 #include "scheduler.h"
-//#include "signal.h"
 
 struct thread* run_queue = NULL;
 extern uint64 freq_thread;

@@ -11,6 +11,8 @@
 #include "loadimg.h"
 #include "mailbox.h"
 #include "mmu.h"
+#include "vfs.h"
+#include "tmpfs.h"
 
 struct ARGS{
     char** argv;
@@ -64,6 +66,10 @@ void shell_init(){
     init_thread();
 
     cow_init();
+
+    vfs_init();
+
+    tmpfs_init();
 }
 
 void reset_flag(){
@@ -198,7 +204,8 @@ void check(char *input){
         reset(a<50? 50:a);
         while(1);
     }else if(strcmp(input,"ls")){
-        list(cpio_start);
+        //list(cpio_start);
+        vfs_ls();
     }else if(strncmp(input,"cat ", 4)){
         char name[128];
         for(int i=0;i<128;i++) name[i] &= 0;
