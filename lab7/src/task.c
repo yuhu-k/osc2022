@@ -7,6 +7,7 @@
 #include "excep.h"
 #include "mmu.h"
 #include "cpio.h"
+#include "string.h"
 
 struct thread* ReadyList = NULL;
 extern struct thread *threads[thread_numbers];
@@ -92,7 +93,6 @@ int UserThread(void* func,void* arg){
     t->page_table = ((uint64_t)allocate_page() | 0b11) &  ~0xffff000000000000;
     t->signal = 0;
     t->childs = NULL;
-    //t->ustack = malloc(0x4000);
     t->kstack = kstack;
     t->registers[0] = 0x0;
     t->registers[1] = 0xfffffffff000;
@@ -100,14 +100,17 @@ int UserThread(void* func,void* arg){
     t->registers[10] = ( (uint64)(t->kstack + 0x10000) & 0xfffffffffffffff0);
     t->registers[11] = from_el1_to_el0;
     t->registers[12] = t->registers[10];
-    //SetTaskStackPagetable(t->page_table, t->ustack);
+    memset(t->fd,0,sizeof(struct file*) * 65536);
+    t->fd[0];
+    t->fd[1];
+    t->fd[2];
+    vfs_lookup("/",&(t->CurWorkDir));
     
     struct thread *temp = get_current();
     t->ptid = temp->tid;
     t->malloc_table[0] = NULL;
     struct thread_sibling *temp2 = temp->childs;
     struct thread_sibling *new_child = malloc(sizeof(struct thread_sibling));
-    //move_last_mem(t->tid);
     move_last_mem(t->tid);
     move_last_mem(t->tid);
     move_last_mem(t->tid);
@@ -160,7 +163,10 @@ void execute(char *file,char *const argv[]){
     void* code = NULL;
     uint64_t length = 0;
     copy_content(file, &code, &length);
-    if(code == NULL || length == 0) return;
+    if(code == NULL || length == 0) {
+        uart_printf("Error: \"%s\" is not an executable file\n",file);
+        return;
+    }
     int tid = UserThread(code,NULL);
     SetTaskCodePagetable(threads[tid]->page_table,code,length);
     InitUserTaskScheduler();
@@ -170,7 +176,10 @@ void exec(char *file,char *const argv[]){
     void* code = NULL;
     uint64_t length = 0;
     copy_content(file, &code, &length);
-    if(code == NULL || length == 0) return;
+    if(code == NULL || length == 0){
+        uart_printf("Error: \"%s\" is not an executable file\n",file);
+        return;
+    }
     struct thread *t = get_current();
     SetTaskCodePagetable(t->page_table,code,length);
     from_el1_to_el0(code, 0xfffffffff000);

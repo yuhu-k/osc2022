@@ -149,3 +149,30 @@ void *memset(void *str, int c, size_t n){
     for(int i=0;i<n;i++) *string++ = 0;
     return str;
 }
+
+char * strtok(char * str, const char * delimiters){
+    static char* record_str = 0;
+    static char return_word[128];
+    static int i = 0;
+    if(str != NULL) record_str = str;
+    else if(str == NULL && record_str == 0) return NULL;
+    int idx = 0;
+    memset(return_word,0,128);
+    for(;i<256 && str[i]!=0;i++){
+        int n=0;
+        for(int j=0;j<256 && delimiters[j]!=0;j++){
+            if(str[i] == delimiters[j]){
+                if(idx!=0) return return_word;
+                else{
+                    n=1;
+                    break;
+                }
+            }
+        }
+        if(n==0){
+            return_word[idx++] = str[i];
+        }
+    }
+    if(idx!=0) return return_word;
+    else return NULL;
+}

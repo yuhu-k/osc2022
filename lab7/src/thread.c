@@ -28,6 +28,8 @@ int Thread(void *func(void),...){
     t->registers[0] = func;
     t->registers[1] = ( (uint64)(t->ustack + 0x10000) & 0xfffffffffffffff0);
     t->registers[2] = arg;
+    for(int i=0;i<65536;i++) t->fd[i] = NULL;
+    vfs_lookup("/",&(t->CurWorkDir));
     struct thread *temp = get_current();
     t->ptid = temp->tid;
     t->malloc_table[0] = NULL;

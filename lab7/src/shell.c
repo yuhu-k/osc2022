@@ -70,6 +70,8 @@ void shell_init(){
     vfs_init();
 
     tmpfs_init();
+
+    init_cpio();
 }
 
 void reset_flag(){
@@ -203,9 +205,24 @@ void check(char *input){
         }
         reset(a<50? 50:a);
         while(1);
-    }else if(strcmp(input,"ls")){
-        //list(cpio_start);
-        vfs_ls();
+    }else if(strncmp(input,"ls",2)){
+        char name[128];
+        memset(name,0,128);
+        int i=3;
+        for(;input[i]>=46 && input[i]<=122  && i<128 && input[i]!='\0'; i++){
+            name[i-3]=input[i];
+        }
+        name[i]='\0';
+        vfs_ls(name);
+    }else if(strncmp(input,"cd ",3)){
+        char name[128];
+        memset(name,0,128);
+        int i=3;
+        for(;input[i]>=46 && input[i]<=122  && i<128 && input[i]!='\0'; i++){
+            name[i-3]=input[i];
+        }
+        name[i]='\0';
+        vfs_cd(name);
     }else if(strncmp(input,"cat ", 4)){
         char name[128];
         for(int i=0;i<128;i++) name[i] &= 0;

@@ -11,3 +11,4 @@ void strccat(char *string1, char* string2, char *string_out);
 int atoi(char *s);
 int a16toi(char *s);
 void *memset(void *str, int c, size_t n);
+char * strtok(char * str, const char * delimiters);

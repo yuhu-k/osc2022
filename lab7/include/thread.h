@@ -1,4 +1,5 @@
 #pragma once
+#include "vfs.h"
 #define tid_t unsigned int
 #define pid_t unsigned int
 
@@ -41,6 +42,8 @@ struct thread{
     unsigned char *ustack;
     unsigned char *kstack;
     void *page_table;
+    struct file *fd[65536];
+    struct vnode *CurWorkDir;
 };
 
 typedef struct thread thread_t;

@@ -1,3 +1,4 @@
+#pragma once
 #include "uint.h"
 void* simple_malloc(unsigned int size);
 void* malloc(size_t size);

@@ -1,7 +1,6 @@
-#ifndef __mmu__
-#define __mmu__
+#pragma once
 #define pte_t unsigned long long
-#define size_t unsigned int
+#define size_t unsigned long
 typedef struct{pte_t entries[512];} pagetable_t;
 void disable_mmu();
 void setup_mmu();
@@ -16,4 +15,3 @@ void map_pages(unsigned long long des, unsigned long long src);
 void cow_init();
 unsigned long long get_ttbr0_el1();
 
-#endif

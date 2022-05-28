@@ -10,6 +10,8 @@
 #include "queue.h"
 #include "task.h"
 #include "mmu.h"
+#include "vfs.h"
+#include "scheduler.h"
 
 #define uart_puts uart_printf
 
@@ -99,11 +101,73 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
                         tf->x[0] = mmap_set(tf->x[0],tf->x[1],tf->x[2],tf->x[3]);
                         return;
                         break;
-                    case 20:
+                    case 11:{ //file open
+                        //uart_printf("11\n");
+                        void* vnode;
+                        int errno;
+                        if((errno = vfs_open(tf->x[0],tf->x[1],&vnode)) < 0){
+                            uart_printf("File not found: %s\n",tf->x[0]);
+                            tf->x[0] = errno;
+                            return;
+                        }
+                        struct thread *t = get_current();
+                        for(int i=0;i<65536;i++){
+                            if(t->fd[i] == NULL){
+                                t->fd[i] = vnode;
+                                tf->x[0] = i;
+                                return;
+                            }
+                        }
+                        tf->x[0] = -1;
+                        return;
+                        break;
+                    }case 12:{ //file close
+                        //uart_printf("12\n");
+                        struct thread *t = get_current();
+                        int fd = tf->x[0];
+                        tf->x[0] = vfs_close(t->fd[tf->x[0]]);
+                        if(tf->x[0]>=0) t->fd[fd] = NULL;
+                        return;
+                        break;
+                    }case 13:{ //file write
+                        //uart_printf("13\n");
+                        struct thread *t = get_current();
+                        tf->x[0] = vfs_write(t->fd[tf->x[0]],tf->x[1],tf->x[2]);
+                        return;
+                        break;
+                    }case 14:{ //file read
+                        //uart_printf("14\n");
+                        struct thread *t = get_current();
+                        tf->x[0] = vfs_read(t->fd[tf->x[0]],tf->x[1],tf->x[2]);
+                        return;
+                        break;
+                    }case 15:{ //mkdir
+                        //uart_printf("15\n");
+                        struct thread *t = get_current();
+                        tf->x[0] = vfs_mkdir(tf->x[0]);
+                        return;
+                        break;
+                    }case 16:{ //mount
+                        //uart_printf("16\n");
+                        tf->x[0] = vfs_mount(tf->x[1],tf->x[2]);
+                        return;
+                        break;
+                    }case 17:{ //chdir
+                        //uart_printf("17\n");
+                        void *vnode;
+                        tf->x[0] = vfs_lookup(tf->x[0], &vnode);
+                        if(tf->x[0] >= 0){
+                            struct thread *t = get_current();
+                            t->CurWorkDir = vnode;
+                        }
+                        return;
+                        break;
+                    }case 20:
                         ret_to_sig_han(sp_addr + 0x110);
                         return;
                         break;
                     default:
+                        uart_printf("%d ",tf->x[8]);
                         break;
                 }
             }else if(esr>>26==0b100100 || esr>>26==0b100101){
