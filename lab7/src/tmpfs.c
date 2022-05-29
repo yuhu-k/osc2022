@@ -16,6 +16,7 @@ void tmpfs_init(){
     tmpfs_vops->create = tmpfs_create;
     tmpfs_vops->lookup = tmpfs_lookup;
     tmpfs_vops->mkdir = tmpfs_mkdir;
+    tmpfs_vops->mknod = tmpfs_mknod;
     tmpfs_fops->close = tmpfs_close;
     tmpfs_fops->lseek64 = tmpfs_lseek64;
     tmpfs_fops->open = tmpfs_open;
@@ -33,6 +34,7 @@ void tmpfs_init(){
     struct vnode* tmp;
     
     tmpfs_mkdir(rootfs->root,&tmp,"initramfs");
+    tmpfs_mkdir(rootfs->root,&tmp,"dev");
 }
 
 int tmpfs_mount(struct filesystem* fs, struct mount* mount){
@@ -226,4 +228,28 @@ long tmpfs_lseek64(struct file* file, long offset, int whence){
         file->f_pos = offset;
         return file->f_pos;
     }
+}
+
+int tmpfs_mknod(struct vnode* dir_node, struct vnode** target, const char* component_name){
+    struct vnode* tmp;
+    tmpfs_lookup(dir_node,&tmp,component_name);
+    if(tmp != NULL){
+        *target = NULL;
+        return -1;
+    }
+    tmp = allo_vnode();
+    strcpy(component_name,tmp->dt->name,16);
+    tmp->size = 0;
+    tmp->dt->type = device;
+    tmp->dt->vnode = tmp;
+    tmp->mount = NULL;
+    *target = tmp;
+
+    struct link_list *parent_ll = dir_node->dt->childs;
+    while(parent_ll->next!=NULL)parent_ll = parent_ll->next;
+    parent_ll->next = malloc(sizeof(struct link_list));
+    delete_last_mem();
+    parent_ll->next->entry = tmp->dt;
+    parent_ll->next->next = NULL;
+    return 0;
 }

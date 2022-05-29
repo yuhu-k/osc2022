@@ -19,7 +19,8 @@ struct dentry {
     struct vnode* vnode;
     enum type{
       directory,
-      file
+      file,
+      device
     }type;
 };
 
@@ -41,6 +42,11 @@ struct filesystem {
   int (*setup_mount)(struct filesystem* fs, struct mount* mount);
 };
 
+struct device {
+  const char* name;
+  int (*setup)(struct device* device, struct vnode* mount);
+};
+
 struct file_operations {
   int (*write)(struct file* file, const void* buf, size_t len);
   int (*read)(struct file* file, void* buf, size_t len);
@@ -56,10 +62,13 @@ struct vnode_operations {
                 const char* component_name);
   int (*mkdir)(struct vnode* dir_node, struct vnode** target,
               const char* component_name);
+  int (*mknod)(struct vnode* dir_node, struct vnode** target,
+              const char* component_name);
 };
 
 void vfs_init();
 int register_filesystem(struct filesystem* fs);
+int register_device(struct device* d);
 int vfs_open(const char* pathname, int flags, struct file** target);
 int vfs_close(struct file* file);
 int vfs_write(struct file* file, const void* buf, size_t len);
@@ -71,5 +80,6 @@ void vfs_ls(const char* pathname);
 void vfs_cd(const char* pathname);
 struct dentry* allo_dentry();
 struct vnode* allo_vnode();
+int vfs_mknod(const char* pathname, const char* device);
 
 

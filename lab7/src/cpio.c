@@ -210,6 +210,7 @@ void init_cpio(){
     cpio_vops->create   = cpio_perm_denied;
     cpio_vops->mkdir    = cpio_perm_denied;
     cpio_vops->lookup   = cpio_lookup;
+    cpio_vops->mknod    = cpio_perm_denied;
     cpio_fops->write    = cpio_perm_denied;
     cpio_fops->close    = cpio_close;
     cpio_fops->lseek64  = cpio_lseek64;

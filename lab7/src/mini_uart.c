@@ -5,6 +5,8 @@
 #include "jump.h"
 #include "signal.h"
 #include "thread.h"
+#include "vfs.h"
+#include "string.h"
 
 int transmit_interrupt_open = 0;
 char uart_buffer[1024];
@@ -56,7 +58,6 @@ void uart_init() {
     *AUX_MU_CNTL = 3;
 
     transmit_interrupt_open = 0;
-    
 }
 
 void uart_init_buffer(){
@@ -199,3 +200,88 @@ void *handle_uart_irq()
     *AUX_MU_IER = 1;
     return;
 }
+
+struct file_operations *uart_fops;
+struct vnode_operations *uart_vops;
+
+
+int uart_setup(struct device* device, struct vnode* mount){
+    mount->f_ops = uart_fops;
+    mount->v_ops = uart_vops;
+}
+
+int device_per_denied(){
+    uart_printf("Permission denied\n");
+    return -1;
+}
+
+int uart_vfs_write(struct file* file, const void* buf, size_t len){
+    char *tmp = buf;
+    for(int i=0;i<len && tmp[i]!=0;i++){
+        uart_write(tmp[i]);
+    }
+    return len;
+}
+
+int uart_vfs_read(struct file* file, void* buf, size_t len){
+    char *internal = buf;
+    char temp[256];
+    int rn = 0;
+    while(1){
+        temp[0] = 0;
+        uart_pop(temp);
+        for(int i=0;i<256;i++){
+            if(temp[i] == 0) break;
+            internal[rn++] = temp[i];
+            if(rn >= len){
+                return len;
+            }
+        }
+    }
+}
+
+int uart_open(struct vnode* file_node, struct file** target){
+    struct file* tmp = malloc(sizeof(struct file));
+    delete_last_mem();
+    tmp->f_pos = 0;
+    tmp->f_ops = uart_fops;
+    tmp->vnode = file_node;
+    *target = tmp;
+    return 0;
+}
+
+int uart_close(struct file* file){
+    if(file->f_pos > file->vnode->size) file->vnode->size = file->f_pos; 
+    free(file);
+    return 0;
+}
+
+void vfs_uart_init(){
+    struct device *dev = malloc(sizeof(struct device));
+    delete_last_mem();
+    dev->name = malloc(16);
+    delete_last_mem();
+    memset(dev->name,0,16);
+
+    uart_fops = malloc(sizeof(struct file_operations));
+    uart_vops = malloc(sizeof(struct vnode_operations));
+    delete_last_mem();
+    delete_last_mem();
+    uart_fops->open     = uart_open;
+    uart_fops->read     = uart_vfs_read;
+    uart_fops->write    = uart_vfs_write;
+    uart_fops->close    = uart_close;
+    uart_fops->lseek64  = device_per_denied;
+    uart_vops->create   = device_per_denied;
+    uart_vops->lookup   = device_per_denied;
+    uart_vops->mkdir    = device_per_denied;
+    uart_vops->mknod    = device_per_denied;
+
+
+
+    strcpy("uart\0",dev->name,5);
+    dev->setup = uart_setup;
+    register_device(dev);
+    vfs_mknod("/dev/uart", "uart");
+}
+

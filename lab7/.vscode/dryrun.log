@@ -13,6 +13,7 @@ aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/exceptions.c -o out/exceptio
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/task.c -o out/task.o -fno-stack-protector -mstrict-align
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/mini_uart.c -o out/mini_uart.o -fno-stack-protector -mstrict-align
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/math.c -o out/math.o -fno-stack-protector -mstrict-align
+aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/device.c -o out/device.o -fno-stack-protector -mstrict-align
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/allocator.c -o out/allocator.o -fno-stack-protector -mstrict-align
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/cpio.c -o out/cpio.o -fno-stack-protector -mstrict-align
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/local_timer.c -o out/local_timer.o -fno-stack-protector -mstrict-align
@@ -26,6 +27,7 @@ aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/reboot.c -o out/reboot.o -fn
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/loadimg.c -o out/loadimg.o -fno-stack-protector -mstrict-align
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/thread.c -o out/thread.o -fno-stack-protector -mstrict-align
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/string.c -o out/string.o -fno-stack-protector -mstrict-align
+ 
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/vfs.c -o out/vfs.o -fno-stack-protector -mstrict-align
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/interrupt_queue.c -o out/interrupt_queue.o -fno-stack-protector -mstrict-align
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/start.S -o out/start.o
@@ -36,7 +38,7 @@ aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/temp.S -o out/temp.o
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/mmu_asm.S -o out/mmu_asm.o
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/excep_handler.S -o out/excep_handler.o
 aarch64-linux-gnu-gcc-10 -g -Wall -I include -c src/jump.S -o out/jump.o
-aarch64-linux-gnu-ld -T src/linker.ld -o kernel8.elf out/panic.o out/mini_uart.o out/core_timer.o out/queue.o out/dtb.o out/task.o out/allocator.o out/buffer.o out/exceptions.o out/mmu.o out/math.o out/main.o out/priority_queue.o out/reboot.o out/thread.o out/string.o out/vfs.o out/mailbox.o out/getopt.o out/loadimg.o out/cpio.o out/local_timer.o out/signal.o out/shell.o out/tmpfs.o out/irq2.o out/interrupt_queue.o out/timer.o out/temp.o out/start.o out/jump.o out/irq.o out/scheduler.o out/mmu_asm.o out/excep_handler.o
+aarch64-linux-gnu-ld -T src/linker.ld -o kernel8.elf out/panic.o out/mini_uart.o out/core_timer.o out/queue.o out/dtb.o out/task.o out/allocator.o out/buffer.o out/exceptions.o out/math.o out/main.o out/device.o out/priority_queue.o out/reboot.o out/thread.o out/string.o out/vfs.o out/mmu.o out/mailbox.o out/getopt.o out/loadimg.o out/cpio.o out/local_timer.o out/signal.o out/shell.o out/tmpfs.o out/irq2.o out/interrupt_queue.o out/timer.o out/temp.o out/start.o out/jump.o out/irq.o out/scheduler.o out/mmu_asm.o out/excep_handler.o
 aarch64-linux-gnu-objcopy -O binary kernel8.elf kernel8.img
 g++-11 sendfile.cpp -o sender
 make: Leaving directory '/home/yuhu/osc2022/lab7'

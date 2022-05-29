@@ -10,6 +10,7 @@
 
 struct mount* rootfs;
 struct link_list* filesystem_pool = NULL;
+struct device *dv[100];
 
 
 struct filesystem* find_filesystem(const char *name){
@@ -22,9 +23,19 @@ struct filesystem* find_filesystem(const char *name){
   return NULL;
 }
 
+struct device* find_device(const char *name){
+  for(int i=0;i<100;i++){
+    if(strcmp(name,dv[i]->name)){
+      return dv[i];
+    }
+  }
+  return NULL;
+}
+
 void vfs_init(){
   rootfs = malloc(sizeof(struct mount));
   rootfs->root = NULL;
+  for(int i=0;i<100;i++) dv[i] = NULL;
 }
 
 int register_filesystem(struct filesystem* fs) {
@@ -43,6 +54,16 @@ int register_filesystem(struct filesystem* fs) {
   tmp_pool->next = NULL;
   tmp_pool->entry = fs;
   return 0;
+}
+
+int register_device(struct device* d) {
+  for(int i=0;i<100;i++){
+    if(dv[i] == NULL){
+      dv[i] = d;
+      return 0;
+    }
+  }
+  return -1;
 }
 
 int vfs_open(const char* pathname, int flags, struct file** target) {
@@ -186,7 +207,7 @@ int vfs_lookup(const char* pathname, struct vnode** target){
         if((errno = CurrWorkDir->v_ops->lookup(CurrWorkDir,target,parse)) < 0){
           return errno;
         }
-        if((*target)->mount != NULL && (*target)->mount->root!=NULL) *target = (*target)->mount->root;
+        if((*target)->dt->type == directory && (*target)->mount != NULL && (*target)->mount->root!=NULL) *target = (*target)->mount->root;
         return 0;
       }
     }else{
@@ -194,6 +215,42 @@ int vfs_lookup(const char* pathname, struct vnode** target){
     }
   }
   return -2;
+}
+
+int vfs_mknod(const char* pathname, const char* device){
+  int errno;
+  struct vnode *tmp,*target;
+  if(vfs_lookup(pathname,&tmp) >= 0){
+    return -1;
+  }
+  int last_slash = -1;
+  char path[256], component[256];
+  memset(path,0,256);
+  memset(component,0,256);
+  for(int i=0;i<256;i++){
+    if(pathname[i] == '/' && pathname[i+1]!=0 && pathname[i+1]!=' ') last_slash = i;
+    if(pathname[i] == 0) break;
+  }
+  for(int i=0;i<last_slash;i++){
+    path[i] = pathname[i];
+  }
+  if(last_slash == -1) {
+    struct thread *t = get_current();
+    tmp = t->CurWorkDir;
+  }else{
+    if(last_slash == 0)path[0] = '/';
+    vfs_lookup(path,&tmp);
+  } 
+  for(int i=last_slash+1;i<256;i++){
+    if(pathname[i] == 0)break;
+    component[i-last_slash-1] = pathname[i];
+  }
+  errno = tmp->v_ops->mknod(tmp,&target,component);
+  if(errno < 0) return errno;
+  struct device *d = find_device(device);
+  if(d == NULL) return -2;
+  errno = d->setup(d,target);
+  return errno;
 }
 
 void vfs_ls(const char* pathname){

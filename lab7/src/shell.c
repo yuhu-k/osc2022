@@ -72,6 +72,8 @@ void shell_init(){
     tmpfs_init();
 
     init_cpio();
+
+    vfs_uart_init();
 }
 
 void reset_flag(){

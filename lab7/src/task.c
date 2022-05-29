@@ -101,9 +101,11 @@ int UserThread(void* func,void* arg){
     t->registers[11] = from_el1_to_el0;
     t->registers[12] = t->registers[10];
     memset(t->fd,0,sizeof(struct file*) * 65536);
-    t->fd[0];
-    t->fd[1];
-    t->fd[2];
+    struct file* tmp;
+    vfs_open("/dev/uart",64,&tmp);
+    t->fd[0] = tmp;
+    t->fd[1] = tmp;
+    t->fd[2] = tmp;
     vfs_lookup("/",&(t->CurWorkDir));
     
     struct thread *temp = get_current();
