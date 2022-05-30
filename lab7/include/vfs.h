@@ -1,7 +1,8 @@
 #pragma once
 #define size_t unsigned long
 #include "list.h"
-#define O_CREAT 00000100
+#define O_CREAT  00000100
+#define SEEK_SET 0
 
 struct vnode {
   struct mount* mount;
@@ -64,6 +65,7 @@ struct vnode_operations {
               const char* component_name);
   int (*mknod)(struct vnode* dir_node, struct vnode** target,
               const char* component_name);
+  int (*ioctl)(struct vnode* node, unsigned long request, ...);
 };
 
 void vfs_init();
@@ -81,5 +83,5 @@ void vfs_cd(const char* pathname);
 struct dentry* allo_dentry();
 struct vnode* allo_vnode();
 int vfs_mknod(const char* pathname, const char* device);
-
+long vfs_lseek(struct file* f, long offset, int whence);
 

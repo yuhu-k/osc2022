@@ -162,6 +162,21 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
                         }
                         return;
                         break;
+                    }case 18:{  //long lseek64(int fd, long offset, int whence);
+                        //uart_printf("18\n");
+                        struct thread *t = get_current();
+                        vfs_lseek(t->fd[tf->x[0]],tf->x[1],tf->x[2]);
+                        return;
+                    }case 19:{  //int ioctl(int fd, unsigned long request, ...);
+                        //uart_printf("19\n");
+                        struct thread *t = get_current();
+                        struct file* file = t->fd[tf->x[0]];
+                        if(file == NULL){
+                            tf->x[0] = -1;
+                            return;
+                        }
+                        tf->x[0] = file->vnode->v_ops->ioctl(file->vnode,tf->x[1],tf->x[2]);
+                        return;
                     }case 20:
                         ret_to_sig_han(sp_addr + 0x110);
                         return;

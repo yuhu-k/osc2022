@@ -13,6 +13,7 @@
 #include "mmu.h"
 #include "vfs.h"
 #include "tmpfs.h"
+#include "framebuffer.h"
 
 struct ARGS{
     char** argv;
@@ -74,6 +75,8 @@ void shell_init(){
     init_cpio();
 
     vfs_uart_init();
+
+    vfs_fb_init();
 }
 
 void reset_flag(){
@@ -84,6 +87,7 @@ void reset_flag(){
 }
 
 void uart_read_line(){
+    //check("./initramfs/vfs1.img");
     char in;
     if(cmd_flag == 0){
         uart_printf("# ");

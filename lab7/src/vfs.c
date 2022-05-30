@@ -253,6 +253,10 @@ int vfs_mknod(const char* pathname, const char* device){
   return errno;
 }
 
+long vfs_lseek(struct file* f, long offset, int whence){
+  return f->f_ops->lseek64(f,offset,whence);
+}
+
 void vfs_ls(const char* pathname){
   struct vnode *tmp;
   if(pathname[0] == 0){
