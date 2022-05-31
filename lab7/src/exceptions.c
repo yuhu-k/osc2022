@@ -175,7 +175,7 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
                             tf->x[0] = -1;
                             return;
                         }
-                        tf->x[0] = file->vnode->v_ops->ioctl(file->vnode,tf->x[1],tf->x[2]);
+                        tf->x[0] = file->vnode->v_ops->ioctl(file,tf->x[1],tf->x[2]);
                         return;
                     }case 20:
                         ret_to_sig_han(sp_addr + 0x110);
@@ -193,7 +193,8 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
                 uart_printf("[Translation fault]: 0x%x %x\n", far>>32, far);
                 if(!mmap_check(far)){
                     // For Segmentation fault
-                    uart_printf("[Segmentation fault]: Kill Process\n");
+                    struct thread *t = get_current();
+                    uart_printf("[Segmentation fault]: Kill Process %d\n",t->tid);
                     asm volatile("msr DAIFClr, 0xf\n");
                     UserExit();
                 }

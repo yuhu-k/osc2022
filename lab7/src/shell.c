@@ -77,6 +77,7 @@ void shell_init(){
     vfs_uart_init();
 
     vfs_fb_init();
+
 }
 
 void reset_flag(){
@@ -306,8 +307,7 @@ void check(char *input){
     }else if(strcmp(cmd->argv[0],"lp")){
         loadimg();
     }else if(strcmp(cmd->argv[0],"test")){
-        get_board_revision();
-        get_arm_memory();
+        fb_splash2();
     }else{
         uart_printf("command not found: %s\n",input);
     }

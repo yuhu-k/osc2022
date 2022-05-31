@@ -65,7 +65,7 @@ struct vnode_operations {
               const char* component_name);
   int (*mknod)(struct vnode* dir_node, struct vnode** target,
               const char* component_name);
-  int (*ioctl)(struct vnode* node, unsigned long request, ...);
+  int (*ioctl)(struct file* file, unsigned long request, ...);
 };
 
 void vfs_init();

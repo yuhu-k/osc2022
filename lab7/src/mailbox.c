@@ -82,7 +82,7 @@ void get_arm_memory() {
 }
 
 unsigned int width, height, pitch, isrgb; /* dimensions and channel order */
-unsigned char *lfb;                       /* raw frame buffer address */
+unsigned long long lfb;                         /* raw frame buffer address */
 
 int set_vc(unsigned int fb_info[4]){
   unsigned int __attribute__((aligned(16))) mbox[36];
@@ -140,12 +140,35 @@ int set_vc(unsigned int fb_info[4]){
     height = mbox[6];       // get actual physical height
     pitch = mbox[33];       // get number of bytes per line
     isrgb = mbox[24];       // get the actual channel order
-    lfb = (void *)((unsigned long)mbox[28]);
+    lfb = ((unsigned long long)mbox[28] | 0xFFFF000000000000);
   } else {
     uart_printf("Unable to set screen resolution to %dx%dx32\n",fb_info[0],fb_info[1]);
   }
 }
 
-void fb_splash(unsigned int color, unsigned int ptr){
-  lfb[ptr] = color;
+void fb_splash(unsigned char color, unsigned long ptr){
+  *((unsigned char *)(lfb + ptr)) = color;
+}
+
+void fb_splash2() {
+    int x, y;
+    unsigned char *ptr = lfb;
+    unsigned int white = 255 << 16 | 255 << 8 | 255;  // A B G R
+    unsigned int black = 0;
+    unsigned int current, start = black, spacing = 40;
+    unsigned long long tmp = 0;
+
+    for (y = 0; y < height; y++) {
+        if (y % spacing == 0 && y != 0) {
+            start = (start == white) ? black : white;
+        }
+        current = start;
+        for (x = 0; x < width; x++) {
+            if (x % spacing == 0 && x != 0) {
+                current = (current == white) ? black : white;
+            }
+            fb_splash(current,tmp);
+            tmp+=4;
+        }
+    }
 }

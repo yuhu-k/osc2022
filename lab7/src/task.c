@@ -15,6 +15,7 @@ extern struct thread *threads[thread_numbers];
 void UserScheduler(){
     if(ReadyList == NULL){
         core_timer_disable();
+        while(delete_first_node() != NULL);
         exit();
     }else{
         struct thread *t = ReadyListPop();

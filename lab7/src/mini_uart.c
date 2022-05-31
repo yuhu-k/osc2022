@@ -217,9 +217,9 @@ int device_per_denied(){
 
 int uart_vfs_write(struct file* file, const void* buf, size_t len){
     char *tmp = buf;
-    for(int i=0;i<len && tmp[i]!=0;i++){
-        uart_write(tmp[i]);
-    }
+    //for(int i=0;i<len && tmp[i]!=0;i++){
+        uart_printf(tmp);
+    //}
     return len;
 }
 

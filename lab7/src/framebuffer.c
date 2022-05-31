@@ -3,6 +3,7 @@
 #include "mini_uart.h"
 #include "allocator.h"
 #include "mailbox.h"
+#include "irq.h"
 struct file_operations *fb_fops;
 struct vnode_operations *fb_vops;
 
@@ -18,8 +19,10 @@ int fb_per_denied(){
 }
 
 int fb_write(struct file* file, const void* buf, size_t len){
-    uint32_t *color = buf;
-    for(int i=0;i<len;i++) fb_splash(color[i],file->f_pos++);
+    const unsigned char *color = buf;
+    for(int i=0;i<len;i++){
+        fb_splash(*(color+i),file->f_pos++);
+    }
     return len;
 }
 
@@ -52,7 +55,7 @@ int fb_lseek64(struct file* file, long offset, int whence){
     }
 }
 
-int fb_ioctl(struct vnode* node, unsigned long request, uint32_t fb_info[4]){
+int fb_ioctl(struct file* file, unsigned long request, uint32_t fb_info[4]){
     if(request == 0){
         set_vc(fb_info);
         return 0;

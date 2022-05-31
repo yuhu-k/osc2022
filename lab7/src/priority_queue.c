@@ -58,6 +58,7 @@ struct node* delete_first_node(){
     uint64 times=nodes->time_to_ring;
     struct node *t = nodes;
     nodes = nodes->next;
+    free(t);
     struct node *temp = nodes;
     while(temp != NULL){
         temp->time_to_ring -= times;
