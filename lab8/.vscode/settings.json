@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "uint.h": "c",
+        "mmu.h": "c",
+        "mini_uart.h": "c",
+        "queue.h": "c",
+        "task.h": "c",
+        "vfs.h": "c",
+        "device.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
+}
