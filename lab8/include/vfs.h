@@ -15,6 +15,7 @@ struct vnode {
 
 struct dentry {
     char name[32];
+    char ext[8];
     struct dentry* parent;
     struct link_list* childs;
     struct vnode* vnode;
@@ -31,6 +32,7 @@ struct file {
   size_t f_pos;  // RW position of this file handle
   struct file_operations* f_ops;
   int flags;
+  struct link_list *content;
 };
 
 struct mount {
@@ -80,6 +82,7 @@ int vfs_mount(const char* target, const char* filesystem);
 int vfs_lookup(const char* pathname, struct vnode** target);
 void vfs_ls(const char* pathname);
 void vfs_cd(const char* pathname);
+void vfs_cat(const char* pathname);
 struct dentry* allo_dentry();
 struct vnode* allo_vnode();
 int vfs_mknod(const char* pathname, const char* device);

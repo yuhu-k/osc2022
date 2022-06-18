@@ -176,3 +176,10 @@ char * strtok(char * str, const char * delimiters){
     if(idx!=0) return return_word;
     else return NULL;
 }
+
+void *memcpy(void *dest, const void *src, size_t n){
+    char *d = dest;
+    char *s = src;
+    for(int i=0;i<n;i++) d[i] = s[i];
+    return dest;
+}

@@ -35,6 +35,7 @@ void tmpfs_init(){
     
     tmpfs_mkdir(rootfs->root,&tmp,"initramfs");
     tmpfs_mkdir(rootfs->root,&tmp,"dev");
+    tmpfs_mkdir(rootfs->root,&tmp,"boot");
 }
 
 int tmpfs_mount(struct filesystem* fs, struct mount* mount){
@@ -129,6 +130,7 @@ int tmpfs_mkdir(struct vnode* dir_node, struct vnode** target, const char* compo
     strcpy(component_name,tmp->dt->name,16);
     tmp->f_ops = tmpfs_fops;
     tmp->v_ops = tmpfs_vops;
+    tmp->mount = NULL;
     tmp->size = 0;
 
     tmp->dt->parent = dir_node->dt;

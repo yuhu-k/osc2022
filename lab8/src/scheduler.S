@@ -105,7 +105,7 @@ sig_handler_assembly:
     bl  from_el1_to_el0_forsig
     mov x0, x19
     blr x19                            //el0 start
-    mov x8, #20
+    mov x8, #100
     svc #0
 
 .global ret_to_sig_han

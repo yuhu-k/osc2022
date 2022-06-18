@@ -125,7 +125,6 @@ int vfs_read(struct file* file, void* buf, size_t len) {
   // 2. block if nothing to read for FIFO type
   // 2. return read size or error code if an error occurs.
   if(file == NULL) return -1;
-  file->f_pos = 0;
   return file->f_ops->read(file,buf,len);
 }
 
@@ -159,15 +158,17 @@ int vfs_mount(const char* target, const char* filesystem){
     return errno;
   }
   struct filesystem *fs = find_filesystem(filesystem);
+
+  
   if(fs == NULL) return -1;
+  
   if(mountpoint->mount != NULL){
     return -1;
   }
+
   mountpoint->mount = malloc(sizeof(struct mount));
   mountpoint->mount->fs = fs;
-  mountpoint->mount->root = malloc(sizeof(struct vnode));
-  mountpoint->mount->root->mount = NULL;
-  mountpoint->mount->root->dt = mountpoint->dt;
+  mountpoint->mount->root = mountpoint;
   
   return fs->setup_mount(fs,mountpoint->mount);
 }
@@ -285,6 +286,20 @@ void vfs_cd(const char* pathname){
   struct thread *t = get_current();
 
   vfs_lookup(pathname, &(t->CurWorkDir));
+}
+
+void vfs_cat(const char* pathname){
+  char buf[512];
+  struct file* f;
+  if(vfs_open(pathname,0,&f) < 0){
+    printf("Error. No such file or directory.\n");
+    return;
+  }
+  while(1){
+    int i = vfs_read(f,buf,512);
+    for(int j=0;j<i;j++) printf("%c",buf[j]);
+    if(i!=512) return;
+  }
 }
 
 struct vnode* allo_vnode(){

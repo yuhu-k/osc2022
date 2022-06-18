@@ -14,6 +14,7 @@
 #include "vfs.h"
 #include "tmpfs.h"
 #include "framebuffer.h"
+#include "sd.h"
 
 struct ARGS{
     char** argv;
@@ -77,6 +78,9 @@ void shell_init(){
     vfs_uart_init();
 
     vfs_fb_init();
+
+    init_sd();
+
 
 }
 
@@ -230,15 +234,8 @@ void check(char *input){
         }
         name[i]='\0';
         vfs_cd(name);
-    }else if(strncmp(input,"cat ", 4)){
-        char name[128];
-        for(int i=0;i<128;i++) name[i] &= 0;
-        int i=4;
-        for(i=4;input[i]>=46 && input[i]<=122  && i<128 && input[i]!='\0'; i++){
-            name[i-4]=input[i];
-        }
-        name[i]='\0';
-        print_content(name, cpio_start);
+    }else if(strncmp(input,"cat", 3)){
+        vfs_cat(input+4);
     }else if(strncmp(input,"./",2)){
         irq_disable();
         char name[128];
@@ -307,7 +304,14 @@ void check(char *input){
     }else if(strcmp(cmd->argv[0],"lp")){
         loadimg();
     }else if(strcmp(cmd->argv[0],"test")){
-        fb_splash2();
+        char *tmp = malloc(512);
+        memset(tmp,0,512);
+        readblock(0,tmp);
+        for(int i=0;i<32;i++){
+            for(int j=i*16;j<i*16 + 16;j++)
+                uart_printf("%d ",tmp[j]);
+            uart_printf("\n");
+        }
     }else{
         uart_printf("command not found: %s\n",input);
     }

@@ -1,5 +1,4 @@
-#ifndef __uint__
-#define __uint__
+#pragma once
 
 #define byte unsigned char
 #define uint16 unsigned short
@@ -15,6 +14,6 @@
 #define uint64_t uint64
 #define uint32_t uint32
 #define uint16_t uint16
+#define uint8_t byte
 #define byte_t byte
 
-#endif

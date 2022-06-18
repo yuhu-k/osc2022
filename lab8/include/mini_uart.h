@@ -10,3 +10,5 @@ void uart_init_buffer();
 int uart_pop(unsigned char *c);
 int uart_push(unsigned char c);
 void vfs_uart_init();
+
+#define printf uart_printf

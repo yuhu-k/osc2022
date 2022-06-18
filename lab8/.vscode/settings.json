@@ -6,7 +6,12 @@
         "queue.h": "c",
         "task.h": "c",
         "vfs.h": "c",
-        "device.h": "c"
+        "device.h": "c",
+        "fstream": "c",
+        "tmpfs.h": "c",
+        "typeinfo": "c",
+        "stdio.h": "c",
+        "cstdio": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }
