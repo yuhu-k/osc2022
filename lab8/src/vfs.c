@@ -297,7 +297,7 @@ void vfs_cat(const char* pathname){
   }
   while(1){
     int i = vfs_read(f,buf,512);
-    for(int j=0;j<i;j++) printf("%c",buf[j]);
+    printf("%s",buf);
     if(i!=512) return;
   }
 }

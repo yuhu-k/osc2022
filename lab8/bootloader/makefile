@@ -29,9 +29,9 @@ $(DUM_DIR):
 clean:
 	rm -rf kernel8.*
 	rm -rf out
-
 run: all
-	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial stdio -d int 
+	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial stdio -initrd initramfs.cpio -dtb  bcm2710-rpi-3-b-plus.dtb -drive if=sd,file=sfn_nctuos.img,format=raw -serial pty
+
 tty:
 	$(SIMU_ENV) -M raspi3 -kernel kernel8.img -display none -serial null -serial pty -initrd initramfs.cpio -dtb bcm2710-rpi-3-b-plus.dtb -d int
 debug: 
