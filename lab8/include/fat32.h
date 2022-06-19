@@ -7,6 +7,7 @@
 #define EOC 0xFFFFFF8
 #define BLOCK_SIZE 512
 #define FAT_ENTRY_PER_BLOCK (BLOCK_SIZE / sizeof(int))
+#define DIRENT_PER_CLUSTER (BLOCK_SIZE / sizeof(struct fat32_dirent))
 struct fat32_boot_sector {
     char jump[3];  // 0x0
     char oem[8];   // 0x3
@@ -74,6 +75,8 @@ struct page_cache{
 };
 
 struct file_internal{
+    unsigned int dentry_cluster_idx;
     unsigned int cluster_idx;
+    int page_num;
     struct page_cache* pages;
 };

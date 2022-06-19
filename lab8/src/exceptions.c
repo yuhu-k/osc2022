@@ -178,7 +178,8 @@ void exception_entry(unsigned long type, unsigned long esr, unsigned long elr, u
                         tf->x[0] = file->vnode->v_ops->ioctl(file,tf->x[1],tf->x[2]);
                         return;
                     }case 20:{
-                        void sync();
+                        tf->x[0] = vfs_sync();
+                        return;
                     }case 100:
                         ret_to_sig_han(sp_addr + 0x110);
                         return;

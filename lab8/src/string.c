@@ -145,8 +145,8 @@ int a16ntoi(char *num, int length){  // transform hex string to int
 }
 
 void *memset(void *str, int c, size_t n){
-    unsigned char* string = (unsigned long)str + c;
-    for(int i=0;i<n;i++) *string++ = 0;
+    unsigned char* string = (unsigned long)str;
+    for(int i=0;i<n;i++) *string++ = c;
     return str;
 }
 

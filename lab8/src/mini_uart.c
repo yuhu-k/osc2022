@@ -276,6 +276,7 @@ void vfs_uart_init(){
     uart_vops->lookup   = device_per_denied;
     uart_vops->mkdir    = device_per_denied;
     uart_vops->mknod    = device_per_denied;
+    uart_vops->sync     = do_nothing;
 
 
 

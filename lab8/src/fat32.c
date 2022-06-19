@@ -26,12 +26,17 @@ int fat32_create(struct vnode* dir_node, struct vnode** target, const char* comp
     tmp = allo_vnode();
     strcpy(component_name,tmp->dt->name,16);
     tmp->f_ops = fat32_fops;
-    tmp->internal = malloc(0x100);
+    struct file_internal* fi = malloc(sizeof(struct file_internal));
     delete_last_mem();
-    memset(tmp->internal,0,0x100);
+    fi->cluster_idx = EOC;
+    fi->dentry_cluster_idx = EOC;
+    fi->pages = NULL;
+    fi->page_num = 0;
+    tmp->internal = fi;
+    
     tmp->v_ops = fat32_vops;
     tmp->f_ops = fat32_fops;
-    tmp->size = 0;
+    tmp->size = 512;
 
     tmp->dt->parent = dir_node->dt;
     tmp->dt->childs = NULL;
@@ -73,6 +78,11 @@ int fat32_mkdir(struct vnode* dir_node, struct vnode** target, const char* compo
     tmp->dt->childs->next->next = NULL; 
     tmp->dt->vnode = tmp;
     tmp->dt->type = directory;
+    struct file_internal* fi = malloc(sizeof(struct file_internal));
+    delete_last_mem();
+    fi->cluster_idx = EOC;
+    fi->pages = NULL;
+    tmp->internal = fi;
     *target = tmp;
 
     tmp_child->name[0] = '.';
@@ -116,7 +126,7 @@ int fat32_lookup(struct vnode* dir_node, struct vnode** target, const char* comp
 
 int fat32_get_content(unsigned int cluster_idx, struct page_cache **pages){
     uint32_t cluster_idx_tmp = cluster_idx;
-    (*pages) = malloc(sizeof(struct page_cache) * 50);
+    (*pages) = malloc(sizeof(struct page_cache) * 20);
     delete_last_mem();
     struct page_cache *pc = (*pages);
     int i=0;
@@ -131,125 +141,53 @@ int fat32_get_content(unsigned int cluster_idx, struct page_cache **pages){
     pc[i].buf = NULL;
 }
 
-/*int fat32_insert_page(struct link_list** list, struct page_cache* page){
-    if(*list == NULL){
-        *list = malloc(sizeof(struct link_list));
-        delete_last_mem();
-        (*list)->entry = page;
-        (*list)->next = NULL;
-        return 0;
-    }else{
-        struct page_cache *pc = (*list)->entry;
-        if((*list)->next == NULL && pc->num < page->num){
-            struct link_list *ll = malloc(sizeof(struct link_list));
-            delete_last_mem();
-            ll->entry = page;
-            ll->next = NULL;
-            (*list)->next = ll;
-            return 0;
-        }else{
-            if(pc->num > page->num){
-                struct link_list *ll = malloc(sizeof(struct link_list));
-                delete_last_mem();
-                ll->entry = page;
-                ll->next = (*list);
-                *list = ll;
-                return 0;
-            }else if(pc->num == page->num){
-                free(pc->buf);
-                free(pc);
-                (*list)->entry = page;
-                return 0;
-            }else{
-                struct link_list *tmp = (*list);
-                while(tmp->next != NULL){
-                    pc = tmp->next->entry;
-                    if(pc->num > page->num){
-                        struct link_list *ll = malloc(sizeof(struct link_list));
-                        delete_last_mem();
-                        ll->entry = page;
-                        ll->next = tmp->next;
-                        tmp->next = ll;
-                        return 0;
-                    }else if(pc->num == page->num){
-                        free(pc->buf);
-                        free(pc);
-                        tmp->next->entry = page;
-                        return 0;
-                    }
-                    tmp = tmp->next;
-                }
-                struct link_list *ll = malloc(sizeof(struct link_list));
-                delete_last_mem();
-                ll->entry = page;
-                ll->next = NULL;
-                tmp->next = ll;
-                return 0;
-            }
-        }
-    }
-}*/
 
 int fat32_write(struct file* file, const void* buf, size_t len){
-    /*struct file_internal *internal = file->vnode->internal;
-    size_t writen_len = 0;
+    struct file_internal *internal = file->vnode->internal;
     if(internal->pages != NULL){
-        int page_idx = file->f_pos/512;
+        char *tmp = buf;
+        size_t read_l = 0;
         int pt = file->f_pos%512;
-        struct link_list *non_modified_ll = internal->pages;
-        struct link_list *modified_ll = file->content->entry;
-        while(non_modified_ll != NULL){
-            struct page_cache *pc = non_modified_ll->entry;
-            if(pc->num >= page_idx) break;
-            non_modified_ll = non_modified_ll->next;
-        }
-        while(modified_ll != NULL){
-            struct page_cache *pc = modified_ll->entry;
-            if(pc->num >= page_idx) break;
-            non_modified_ll = non_modified_ll->next;
-        }
-        char* dest_buf;
-        if(modified_ll == NULL){
-            struct link_list* tmp_ll = malloc(sizeof(struct link_list));
-            delete_last_mem();
-            struct page_cache* pc = malloc(sizeof(struct page_cache));
-            delete_last_mem();
-            pc->buf = malloc(512);
-            pc->modified = 1;
-            pc->num = page_idx;
-            tmp_ll->entry = pc;
-            tmp_ll->next = NULL;
-            if(non_modified_ll != NULL){
-                struct page_cache* pc2 = non_modified_ll->entry;
-                memcpy(pc->buf,pc2->buf,512);
+        int pages_num = file->f_pos/512;
+        while(read_l < len){
+            if(pages_num >= internal->page_num){
+                struct page_cache* new_page_num = malloc(sizeof(struct page_cache) * (pages_num/10+1)*10);
+                memcpy(new_page_num,internal->pages,internal->page_num);
+                free(internal->pages);
+                file->vnode->size += 512*(pages_num-internal->page_num+1);
+                internal->page_num = pages_num+1;
             }
-            modified_ll = tmp_ll;
-            dest_buf = pc->buf;
-            void* tmp = file->content;
-            fat32_insert_page(&tmp,pc);
-            file->content = tmp;
-        }else{
-            struct page_cache* pc = modified_ll->entry;
-            dest_buf = pc->buf;
-        }
-        while(writen_len < len){
-            if(pt >= 512){
-                pt %= 512;
-                page_idx++;
-                if(modified_ll == NULL){
-
-                }
+            if(internal->pages[pages_num].buf == NULL) {
+                internal->pages[pages_num].buf = malloc(512);
+                delete_last_mem();
             }
-            dest_buf[pt++] = buf[writen_len++];
-            file->f_pos++;
+            char *tmp_buf = internal->pages[pages_num].buf;
+            internal->pages[pages_num].modified = 1;
+            for(int i=pt;i<512 && read_l < len;i++){
+                tmp_buf[i] = tmp[read_l++];
+                file->f_pos++;
+            }
+            pt = 0;
+            pages_num++;
         }
+        return len;
     }else{
-        struct file_internal *tmp;
+        if(internal->cluster_idx >= EOC){
+            internal->page_num = 1;
+            internal->pages = malloc(sizeof(struct page_cache));
+            delete_last_mem();
+            internal->pages[0].modified = 1;
+            internal->pages[0].buf = malloc(512);
+            delete_last_mem();
+            memset(internal->pages[0].buf,0,512);
+            return fat32_write(file,buf,len);
+        }
+        struct page_cache *tmp;
         fat32_get_content(internal->cluster_idx,&tmp);
         internal->pages = tmp;
-        struct page_cache *pc = internal->pages;
+        internal->page_num = 20;
         return fat32_write(file,buf,len);
-    }*/
+    }
 }
 
 int fat32_read(struct file* file, void* buf, size_t len){
@@ -281,6 +219,7 @@ int fat32_read(struct file* file, void* buf, size_t len){
         struct page_cache *tmp;
         fat32_get_content(internal->cluster_idx,&tmp);
         internal->pages = tmp;
+        internal->page_num = 20;
         return fat32_read(file,buf,len);
     }
 }
@@ -331,7 +270,8 @@ static unsigned int get_next_cluster(uint32_t cluster_idx){
 }
 
 void traverse_fat32(struct vnode* start){
-    uint32_t cluster_idx = start->internal;
+    struct file_internal* fi = start->internal;
+    uint32_t cluster_idx = fi->cluster_idx;
     struct fat32_dirent *fd;
     char buf[512];
     do{
@@ -358,8 +298,10 @@ void traverse_fat32(struct vnode* start){
             else fat32_create(start,&record,name);
             struct file_internal* internal = malloc(sizeof(struct file_internal));
             delete_last_mem();
+            internal->dentry_cluster_idx = cluster_idx*DIRENT_PER_CLUSTER + i;
             internal->cluster_idx = (uint32_t)fd[i].cluster_high << 16|fd[i].cluster_low;
             internal->pages = NULL;
+            internal->page_num = 0;
             record->internal = internal;
             record->size = fd[i].size;
             if(record->dt->type == directory) traverse_fat32(record);
@@ -367,6 +309,87 @@ void traverse_fat32(struct vnode* start){
 
         cluster_idx = get_next_cluster(cluster_idx);
     }while(cluster_idx < EOC);
+}
+
+int fat32_sync(struct vnode* dir_node, struct vnode* target){
+    struct file_internal* internal = target->internal;
+    if(internal->dentry_cluster_idx >= EOC && internal->cluster_idx >= EOC){
+        struct file_internal* parent_internal = dir_node->internal;
+        unsigned int parent_idx = parent_internal->cluster_idx;
+        while (get_next_cluster(parent_idx) < EOC) parent_idx = get_next_cluster(parent_idx);
+        char buf[512];
+        readblock(get_cluster_blk_idx(parent_idx),buf);
+        struct fat32_dirent *fds = buf;
+        struct page_cache* pc = internal->pages;
+        int num = 0, cross = -1;
+        unsigned int *last_entry = &(internal->cluster_idx);
+        for(int n=0;n<65536 && num < internal->page_num;n+=FAT_ENTRY_PER_BLOCK){
+            unsigned int tmp_buf[128];
+            readblock(get_fat_idx(n),tmp_buf);
+            for(int k=0;k<128;k++){
+                if(tmp_buf[k] == 0){
+                    if(cross != -1){
+                        readblock(get_fat_idx(cross),tmp_buf);
+                        *last_entry = n+k;
+                        writeblock(get_fat_idx(cross),tmp_buf);
+                        cross = -1;
+                        readblock(get_fat_idx(n),tmp_buf);
+                    }else *last_entry = n+k;
+                    if(pc[num].modified == 0 || pc[num].buf == NULL){
+                        char tmp_buf2[512];
+                        memset(tmp_buf2,0,512);
+                        writeblock(get_cluster_blk_idx(n+k),tmp_buf2);
+                    }else writeblock(get_cluster_blk_idx(n+k),pc[num].buf);
+                    last_entry = &(tmp_buf[k]);
+                    if(++num >= internal->page_num) break; 
+                }
+            }
+            writeblock(get_fat_idx(n),tmp_buf);
+            cross = n;
+        }
+        for(int i=0;i<16;i++){
+            if(fds[i].name[0] == '\0' || fds[i].name[0] == 0xE5){
+                internal->dentry_cluster_idx = parent_idx*DIRENT_PER_CLUSTER+i;
+                memset(fds[i].name,' ',8);
+                memset(fds[i].ext,' ',3);
+                int j;
+                for(j=0;j<8 && target->dt->name[j]!='.' && target->dt->name[j]!=0;j++)
+                    fds[i].name[j] = target->dt->name[j];
+                for(int k=0;k<3 && j < 8 && target->dt->name[j+1+k]!=0;k++){
+                    fds[i].ext[k] = target->dt->name[j+1+k];
+                }
+                int attr = 0;
+                if(target->dt->type == directory) attr |= (1<<4);
+                fds[i].attr = attr;
+                fds[i].size = target->size;
+                fds[i].cluster_high = (internal->cluster_idx >> 16);
+                fds[i].cluster_low = (internal->cluster_idx & 65535);
+                writeblock(get_cluster_blk_idx(parent_idx),buf);
+                break;
+            }
+        }
+        if(target->dt->type == directory){
+            struct link_list *child = target->dt->childs;
+            while(child != NULL){
+                struct dentry* d = child->entry;
+                if(d->name[0] == '.') continue;
+                fat32_sync(target,d->vnode);
+            } 
+        }
+    }else{
+        if(target->dt->type == directory){
+            struct link_list *child = target->dt->childs;
+            while(child != NULL){
+                struct dentry* d = child->entry;
+                if(d->name[0] == '.'){
+                    child = child->next;
+                    continue;
+                }
+                fat32_sync(target,d->vnode);
+                child = child->next;
+            } 
+        }
+    }
 }
 
 int fat32_mount(struct filesystem* fs, struct mount* mount){
@@ -380,7 +403,7 @@ int fat32_mount(struct filesystem* fs, struct mount* mount){
     struct dentry *tmp_parent = mount->root->dt->childs->next->entry;
     tmp->dt->parent = mount->root->dt->parent;
 
-    tmp->dt->name[0] = 0;
+    tmp->dt->name[0] = '0';
     tmp->dt->childs = malloc(sizeof(struct link_list));
     delete_last_mem();
     tmp->dt->childs->entry = tmp_child;
@@ -400,7 +423,11 @@ int fat32_mount(struct filesystem* fs, struct mount* mount){
     tmp->dt->childs->next->next = NULL;
 
     mount->root = tmp;
-    tmp->internal = sd_metadata.first_cluster;
+    struct file_internal* fi = malloc(sizeof(struct file_internal));
+    delete_last_mem();
+    fi->cluster_idx = sd_metadata.first_cluster;
+    fi->dentry_cluster_idx = EOC;
+    tmp->internal = fi;
     traverse_fat32(tmp);
     return 0;
 }
@@ -415,6 +442,7 @@ void fat32_init(struct fat32_metadata* metadata){
     fat32_vops->lookup = fat32_lookup;
     fat32_vops->mkdir = fat32_mkdir;
     fat32_vops->mknod = NULL;
+    fat32_vops->sync = fat32_sync;
     fat32_fops->close = fat32_close;
     fat32_fops->lseek64 = fat32_lseek64;
     fat32_fops->open = fat32_open;

@@ -8,6 +8,7 @@ struct vnode_operations *tmpfs_vops;
 
 extern struct mount* rootfs;
 
+
 void tmpfs_init(){
     tmpfs_vops = malloc(sizeof(struct vnode_operations));
     delete_last_mem();
@@ -17,6 +18,7 @@ void tmpfs_init(){
     tmpfs_vops->lookup = tmpfs_lookup;
     tmpfs_vops->mkdir = tmpfs_mkdir;
     tmpfs_vops->mknod = tmpfs_mknod;
+    tmpfs_vops->sync = do_nothing;
     tmpfs_fops->close = tmpfs_close;
     tmpfs_fops->lseek64 = tmpfs_lseek64;
     tmpfs_fops->open = tmpfs_open;

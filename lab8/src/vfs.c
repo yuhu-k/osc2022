@@ -316,3 +316,24 @@ struct dentry* allo_dentry(){
   memset(de->name,0,32);
   return de;
 }
+
+int vfs_sync(){
+  struct vnode* start;
+  if(vfs_lookup("/boot",&start) < 0) return -1;
+  /*else{
+    struct link_list *ll = start->dt->childs;
+    while(ll != NULL){
+      struct dentry* d = ll->entry;
+      if(d->name[0] != '.'){
+        d->vnode->v_ops->sync(start, d->vnode);
+      }
+      ll = ll->next;
+    }
+    return 0;
+  }*/
+  start->v_ops->sync(NULL,start);
+}
+
+int do_nothing(){
+    return 0;
+}

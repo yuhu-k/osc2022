@@ -67,6 +67,7 @@ struct vnode_operations {
   int (*mknod)(struct vnode* dir_node, struct vnode** target,
               const char* component_name);
   int (*ioctl)(struct file* file, unsigned long request, ...);
+  int (*sync)(struct vnode* dir_node, struct vnode* target);
 };
 
 void vfs_init();
@@ -86,4 +87,5 @@ struct dentry* allo_dentry();
 struct vnode* allo_vnode();
 int vfs_mknod(const char* pathname, const char* device);
 long vfs_lseek(struct file* f, long offset, int whence);
-
+int vfs_sync();
+int do_nothing();
