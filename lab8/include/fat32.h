@@ -70,11 +70,10 @@ void fat32_init(struct fat32_metadata* metadata);
 
 struct page_cache{
     unsigned char modified;
-    int num;
     char *buf;
 };
 
 struct file_internal{
     unsigned int cluster_idx;
-    struct link_list* pages;
+    struct page_cache* pages;
 };

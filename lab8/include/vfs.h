@@ -32,7 +32,6 @@ struct file {
   size_t f_pos;  // RW position of this file handle
   struct file_operations* f_ops;
   int flags;
-  struct link_list *content;
 };
 
 struct mount {
